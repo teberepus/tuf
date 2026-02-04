@@ -240,18 +240,91 @@
             }).then(() => { alert("LANÇADO!"); location.reload(); });
         }
 
-        function salvarNovoInflu() {
-            const email = document.getElementById('new-email').value.toLowerCase().trim().replace(/\./g, '_');
-            const data = {
-                nome: document.getElementById('new-name').value.trim(),
-                senha: document.getElementById('new-pass').value.trim(),
-                base: parseFloat(document.getElementById('new-base').value)||0,
-                acordoCPA: parseFloat(document.getElementById('new-cpa').value)||0,
-                pix: document.getElementById('new-pix').value.trim(),
-                pagamento: document.getElementById('pay-freq').value + " (" + document.getElementById('pay-day').value + ")"
-            };
-            db.ref('usuarios/'+email).set(data).then(() => { alert("CADASTRADO!"); location.reload(); });
+        // --- COPIE DAQUI PARA BAIXO E SUBSTITUA NO SEU ADMIN.HTML ---
+
+function salvarNovoInflu() {
+    const emailRaw = document.getElementById('new-email').value.trim();
+    if(!emailRaw) return alert("ERRO: O E-mail é obrigatório para o login!");
+    
+    // Converte o e-mail para um formato que o Firebase aceite (chave do banco)
+    const key = emailRaw.toLowerCase().replace(/\./g, '_').replace(/@/g, '_at_');
+    
+    const data = {
+        nome: document.getElementById('new-name').value.trim() || emailRaw,
+        senha: document.getElementById('new-pass').value.trim() || "123",
+        base: parseFloat(document.getElementById('new-base').value) || 0,
+        acordoCPA: parseFloat(document.getElementById('new-cpa').value) || 0,
+        pix: document.getElementById('new-pix').value.trim() || "NÃO INFORMADO",
+        pagamento: document.getElementById('pay-freq').value + " (" + document.getElementById('pay-day').value + ")",
+        dataInicio: "01/02/2026",
+        dataFim: "28/02/2026"
+    };
+
+    // Salva no Firebase
+    db.ref('usuarios/' + key).set(data).then(() => {
+        alert("✅ CADASTRADO COM SUCESSO!");
+        document.getElementById('new-email').value = "";
+        document.getElementById('new-pass').value = "";
+        mudarTab('gerenciar');
+    }).catch(e => alert("Erro ao salvar: " + e.message));
+}
+
+function carregarDados() {
+    db.ref('usuarios').on('value', s => {
+        const lista = document.getElementById('lista-corpo');
+        const select = document.getElementById('select-influencer');
+        const histCorpo = document.getElementById('lista-historico-corpo');
+        
+        if(lista) lista.innerHTML = '';
+        if(histCorpo) histCorpo.innerHTML = '';
+        if(select) select.innerHTML = '<option value="">-- SELECIONE --</option>';
+        
+        influsData = {};
+        let count = 0;
+
+        if(!s.exists()) {
+            if(document.getElementById('perf-count')) document.getElementById('perf-count').innerText = 0;
+            return;
         }
+
+        s.forEach(u => {
+            const d = u.val() || {};
+            const key = u.key;
+            influsData[key] = d;
+            count++;
+            
+            const nomeInflu = d.nome || key;
+
+            if(lista) {
+                lista.innerHTML += `<tr class="border-b-4 border-black font-black uppercase text-[10px] text-black">
+                    <td class="p-4 text-red-600">${nomeInflu}</td>
+                    <td class="p-4">${key}</td>
+                    <td class="p-4">${d.senha || '---'}</td>
+                    <td class="p-4">B:${d.base || 0}/C:${d.acordoCPA || 0}</td>
+                    <td class="p-4"><button onclick="excluir('${key}')">🗑️</button></td>
+                </tr>`;
+            }
+            if(select) select.innerHTML += `<option value="${key}">${nomeInflu.toUpperCase()}</option>`;
+
+            if(d.historico && histCorpo) {
+                Object.keys(d.historico).forEach(dt => {
+                    const h = d.historico[dt] || {};
+                    const totalRec = (parseFloat(h.depositos_qftd||0) + parseFloat(h.depositos_brutos||0)).toFixed(2);
+                    histCorpo.innerHTML += `<tr class="border-b-2 border-black text-black">
+                        <td class="p-3">${dt}</td>
+                        <td class="p-3 text-red-600">${nomeInflu}</td>
+                        <td class="p-3">${h.qftd || 0}</td>
+                        <td class="p-3">${h.ftd || 0}</td>
+                        <td class="p-3">R$ ${totalRec}</td>
+                        <td class="p-3 text-red-600">R$ ${parseFloat(h.cpa||0).toFixed(2)}</td>
+                    </tr>`;
+                });
+            }
+        });
+        if(document.getElementById('perf-count')) document.getElementById('perf-count').innerText = count;
+        if(typeof lucide !== 'undefined') lucide.createIcons();
+    });
+}
 
         function ajustarDias() {
             const freq = document.getElementById('pay-freq').value;
