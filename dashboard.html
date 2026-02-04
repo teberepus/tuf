@@ -7,56 +7,62 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         body { background-color: #0f172a; font-family: 'Inter', sans-serif; color: white; margin: 0; }
         .sidebar { background-color: #1a2235; border-right: 1px solid #2d3748; height: 100vh; position: sticky; top: 0; }
         .card-stat { background-color: transparent; border: 1px solid #334155; border-radius: 12px; padding: 20px; display: flex; align-items: center; gap: 16px; transition: 0.3s; }
-        .card-stat:hover { background-color: #1e293b; border-color: #ef4444; }
-        .text-label { color: #94a3b8; font-size: 13px; font-weight: 600; text-transform: uppercase; }
+        .card-stat:hover { background-color: #1e293b; border-color: #4a5568; }
+        .text-label { color: #94a3b8; font-size: 13px; font-weight: 600; }
         .text-value { font-size: 26px; font-weight: 800; color: #ffffff; }
-        .highlight-red { border: 1px solid #ef4444 !important; }
+        .highlight-blue { border: 1px solid #3b82f6 !important; }
         #modal-filtro { background-color: rgba(15, 23, 42, 0.9); }
         .modal-content { background-color: #1a2235; border: 1px solid #334155; width: 450px; }
         .input-data { background-color: #0f172a; border: 1px solid #334155; padding: 12px; border-radius: 8px; width: 100%; color: white; outline: none; }
-        .btn-aplicar { background-color: #ef4444; color: white; font-weight: 700; padding: 12px; border-radius: 8px; transition: 0.3s; }
-        .btn-aplicar:hover { background-color: #dc2626; }
-        #toast { visibility: hidden; min-width: 280px; background-color: #ef4444; color: white; text-align: center; border-radius: 8px; padding: 16px; position: fixed; z-index: 200; bottom: 30px; left: 50%; transform: translateX(-50%); font-weight: 700; }
+        .input-data:focus { border-color: #a3e635; }
+        .btn-aplicar { background-color: #a3e635; color: #0f172a; font-weight: 700; padding: 12px; border-radius: 8px; transition: 0.3s; }
+        .btn-aplicar:hover { background-color: #bef264; }
+        #toast { visibility: hidden; min-width: 280px; background-color: #a3e635; color: #0f172a; text-align: center; border-radius: 8px; padding: 16px; position: fixed; z-index: 200; bottom: 30px; left: 50%; transform: translateX(-50%); font-weight: 700; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
         #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
         @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
         @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+        .footer-text { color: #475569; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.6; }
     </style>
 </head>
-<body class="flex">
+<body class="flex flex-col md:flex-row">
 
     <aside class="w-64 sidebar hidden md:flex flex-col p-6">
-        <a href="dashboard.html" class="mb-10 block hover:opacity-80 transition">
-            <img src="icones/tuf.png" class="h-10 w-fit">
+        <a href="dashboard.html" class="mb-12 block hover:opacity-80 transition">
+            <img src="icones/tuf.png" class="h-12 w-fit">
         </a>
         
         <nav class="space-y-4 flex-1">
             <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Menu Principal</p>
-            <button onclick="mudarTab('overview')" id="btn-overview" class="flex items-center w-full text-red-500 bg-slate-800/20 p-3 rounded-lg border-l-4 border-red-500 font-bold">
+            <button onclick="mudarTab('overview')" id="btn-overview" class="flex items-center w-full text-blue-400 bg-slate-800/20 p-3 rounded-lg border-l-4 border-blue-500 font-bold">
                 <i data-lucide="layout-dashboard" class="mr-3 w-5 h-5"></i> Overview
             </button>
         </nav>
-        <button onclick="logout()" class="flex items-center text-slate-500 hover:text-red-400 p-3 transition border-t border-slate-700 pt-6">
-            <i data-lucide="log-out" class="mr-3 w-5 h-5"></i> Sair
-        </button>
+        
+        <div class="mt-auto pt-6 border-t border-slate-700">
+            <p class="footer-text mb-4 text-center">© TUF Agency - Marketing SPRBT desde 2023</p>
+            <button onclick="logout()" class="flex items-center text-slate-500 hover:text-red-400 p-3 transition w-full">
+                <i data-lucide="log-out" class="mr-3 w-5 h-5"></i> Sair
+            </button>
+        </div>
     </aside>
 
     <main class="flex-1 p-8">
         <header class="flex justify-between items-center mb-6">
-            <h2 id="titulo-pagina" class="text-2xl font-bold uppercase italic">Overview</h2>
+            <h2 id="titulo-pagina" class="text-2xl font-bold">Overview</h2>
             <div class="relative">
-                <button onclick="toggleDropdown()" class="flex items-center gap-3 bg-transparent p-1 px-4 rounded-full border border-slate-700 hover:border-red-500 transition">
-                    <span id="top-user-name" class="text-sm font-medium text-slate-300 uppercase italic font-bold">...</span>
-                    <div id="avatar-inicial" class="h-9 w-9 bg-red-600 rounded-lg flex items-center justify-center text-sm font-black border border-black text-white uppercase italic">?</div>
+                <button onclick="toggleDropdown()" class="flex items-center gap-3 bg-transparent p-1 px-4 rounded-full border border-slate-700 hover:border-blue-500 transition">
+                    <span id="top-user-name" class="text-sm font-medium text-slate-300 uppercase">...</span>
+                    <div id="avatar-inicial" class="h-9 w-9 bg-slate-600 rounded-full flex items-center justify-center text-sm font-bold border border-blue-500 text-white uppercase">?</div>
                 </button>
                 <div id="dropdown" class="hidden absolute right-0 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-xl z-50 overflow-hidden shadow-2xl">
                     <button onclick="mudarTab('perfil')" class="flex items-center w-full p-4 text-sm text-slate-300 hover:bg-slate-700">
-                        <i data-lucide="user-circle" class="mr-3 w-4 h-4 text-red-500"></i> Meu Perfil
+                        <i data-lucide="user-circle" class="mr-3 w-4 h-4 text-lime-400"></i> Meu Perfil
                     </button>
                     <button onclick="logout()" class="flex items-center w-full p-4 text-sm text-red-400 hover:bg-slate-700 border-t border-slate-700">
                         <i data-lucide="log-out" class="mr-3 w-4 h-4"></i> Sair
@@ -66,42 +72,45 @@
         </header>
 
         <div id="filtros-topo" class="mb-8 flex justify-between items-center">
-            <button onclick="abrirModalFiltro()" class="flex items-center gap-2 px-4 py-2 bg-transparent border border-slate-700 rounded-md text-slate-400 hover:border-red-500 transition">
-                <i data-lucide="calendar" class="w-4 h-4 text-red-500"></i>
-                <span id="periodo-exibicao" class="text-xs font-bold uppercase tracking-tighter">Carregando...</span>
+            <button onclick="abrirModalFiltro()" class="flex items-center gap-2 px-4 py-2 bg-transparent border border-slate-700 rounded-md text-slate-400 hover:border-lime-400 transition">
+                <i data-lucide="calendar" class="w-4 h-4 text-lime-400"></i>
+                <span id="periodo-exibicao" class="text-xs font-medium uppercase tracking-tighter">Carregando...</span>
             </button>
-            <div class="text-[10px] font-black text-slate-600 uppercase italic">TUF Agency v4.0</div>
+            <div class="bg-slate-800/50 px-3 py-1 rounded border border-slate-700 text-[10px] font-bold text-slate-500 uppercase italic">
+                Um oferecimento SPRBT
+            </div>
         </div>
 
         <div id="secao-overview" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div class="card-stat"><img src="icones/rgst.svg" class="h-12"><div><p class="text-label">Registros</p><h3 id="registros" class="text-value">0</h3></div></div>
+            <div class="card-stat"><img src="icones/rgst.svg" class="h-12"><div><p class="text-label">Registro</p><h3 id="registros" class="text-value">0</h3></div></div>
             <div class="card-stat"><img src="icones/FTD-BkwOULkh.svg" class="h-12"><div><p class="text-label">FTDs Brutos</p><h3 id="ftd" class="text-value">0</h3></div></div>
-            <div class="card-stat highlight-red"><i data-lucide="zap" class="w-10 h-10 text-red-500"></i><div><p class="text-label text-red-500">QFTD (Qualificados)</p><h3 id="qftd" class="text-value text-red-500">0</h3></div></div>
+            <div class="card-stat"><i data-lucide="shield-check" class="w-10 h-10 text-lime-400"></i><div><p class="text-label">QFTD (Qualificados)</p><h3 id="qftd" class="text-value">0</h3></div></div>
             
             <div class="card-stat"><img src="icones/deposito-BqL6OVL2.svg" class="h-12"><div><p class="text-label">Receita Total</p><h3 id="depositos" class="text-value">R$ 0,00</h3></div></div>
-            <div class="card-stat highlight-red"><img src="icones/cpa.svg" class="h-12"><div><p class="text-label">CPA Gerado</p><h3 id="cpa" class="text-value">R$ 0,00</h3></div></div>
-            <div class="card-stat bg-red-600/10 border-red-600/30"><i data-lucide="wallet" class="w-10 h-10 text-red-500"></i><div><p class="text-label text-red-400">Total a Receber</p><h3 id="total" class="text-value">R$ 0,00</h3></div></div>
+            <div class="card-stat highlight-blue"><img src="icones/cpa.svg" class="h-12"><div><p class="text-label text-blue-400">Comissão CPA</p><h3 id="cpa" class="text-value">R$ 0,00</h3></div></div>
+            <div class="card-stat"><img src="icones/cprev.svg" class="h-12"><div><p class="text-label">Total a Receber</p><h3 id="total" class="text-value">R$ 0,00</h3></div></div>
         </div>
 
         <div id="secao-perfil" class="hidden max-w-4xl mx-auto">
-            <div class="bg-[#1a2235] border-2 border-slate-700 p-10 rounded-3xl text-center shadow-2xl">
-                <div id="avatar-perfil-grande" class="h-32 w-32 bg-red-600 rounded-2xl mx-auto mb-6 flex items-center justify-center text-4xl font-black italic border-4 border-black text-white uppercase shadow-[8px_8px_0px_#000]">?</div>
-                <h2 class="text-3xl font-black italic mb-4 uppercase tracking-tighter"><span id="perfil-nome-grande">...</span></h2>
+            <div class="bg-[#1a2235] border border-slate-700 p-10 rounded-2xl text-center">
+                <div id="avatar-perfil-grande" class="h-32 w-32 bg-slate-700 rounded-full mx-auto mb-6 flex items-center justify-center text-4xl font-bold border-4 border-slate-600 relative uppercase">?</div>
+                <h2 class="text-2xl font-bold mb-4 uppercase tracking-tight"><span id="perfil-nome-grande">...</span></h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left mt-8">
-                    <div class="card-stat bg-slate-800/50 border-slate-700"><i data-lucide="credit-card" class="w-5 h-5 text-red-500"></i><div><p class="text-label">Chave PIX</p><p id="perfil-pix" class="font-bold text-white uppercase">---</p></div></div>
-                    <div class="card-stat bg-slate-800/50 border-slate-700"><i data-lucide="calendar-check" class="w-5 h-5 text-red-500"></i><div><p class="text-label">Pagamento</p><p id="perfil-pag" class="font-bold text-white uppercase">---</p></div></div>
-                    <div class="card-stat bg-slate-800/50 border-slate-700"><i data-lucide="badge-dollar-sign" class="w-5 h-5 text-red-500"></i><div><p class="text-label">Acordo Base/CPA</p><p id="perfil-acordo" class="font-bold text-white">---</p></div></div>
-                    <div class="card-stat bg-slate-800/50 border-slate-700"><i data-lucide="mail" class="w-5 h-5 text-red-500"></i><div><p class="text-label">Login de Acesso</p><p id="perfil-email" class="font-bold text-slate-300 lowercase">---</p></div></div>
+                    <div class="card-stat border-slate-800"><i data-lucide="credit-card" class="w-5 h-5 text-lime-400"></i><div><p class="text-label">Chave PIX</p><p id="perfil-pix" class="font-bold text-white uppercase">---</p></div></div>
+                    <div class="card-stat border-slate-800"><i data-lucide="calendar-days" class="w-5 h-5 text-lime-400"></i><div><p class="text-label">Pagamento</p><p id="perfil-pag" class="font-bold text-white uppercase">---</p></div></div>
+                    <div class="card-stat border-slate-800"><i data-lucide="zap" class="w-5 h-5 text-lime-400"></i><div><p class="text-label">Meu Acordo</p><p id="perfil-acordo" class="font-bold text-white">---</p></div></div>
+                    <div class="card-stat border-slate-800"><i data-lucide="mail" class="w-5 h-5 text-lime-400"></i><div><p class="text-label">E-mail</p><p id="perfil-email" class="font-bold text-slate-300 lowercase">---</p></div></div>
                 </div>
             </div>
+            <p class="mt-12 footer-text text-center italic">A TUF Agency atua como parceira oficial cuidando de toda a gestão de marketing da Superbet desde 2023.</p>
         </div>
     </main>
 
     <div id="modal-filtro" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
-        <div class="modal-content p-8 rounded-xl relative shadow-2xl border-t-4 border-red-500">
+        <div class="modal-content p-8 rounded-xl relative shadow-2xl border-t-4 border-lime-400">
             <button onclick="fecharModalFiltro()" class="absolute top-4 right-4 text-slate-500 hover:text-white">✕</button>
-            <h3 class="text-xl font-black italic mb-1 uppercase">Filtrar Relatório</h3>
+            <h3 class="text-xl font-bold mb-1 uppercase italic">Filtrar Relatório</h3>
             <p class="text-slate-400 text-sm mb-8">Selecione o período para recalcular os ganhos.</p>
             <div class="space-y-4">
                 <input type="date" id="modal-ini" class="input-data">
@@ -133,13 +142,12 @@
                 document.getElementById('top-user-name').innerText = d.nome || user;
                 document.getElementById('perfil-nome-grande').innerText = d.nome || user;
                 
-                // Polimento Perfil
                 document.getElementById('perfil-pix').innerText = d.pix || 'NÃO CADASTRADO';
                 document.getElementById('perfil-pag').innerText = d.pagamento || 'NÃO DEFINIDO';
                 document.getElementById('perfil-acordo').innerText = `BASE R$ ${d.base} / CPA R$ ${d.acordoCPA}`;
                 document.getElementById('perfil-email').innerText = user.replace(/_/g, '.');
 
-                // Lógica Inteligente de Soma (QFTD e FTD Bruto)
+                // Lógica de Soma v4 Inteligente
                 let reg=0, qftd=0, ftd=0, dep_total=0, cpa=0;
                 if(d.historico) {
                     Object.values(d.historico).forEach(h => {
