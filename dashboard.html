@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TUF Agency - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database-compat.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { background-color: #0f172a; font-family: 'Inter', sans-serif; color: white; margin: 0; }
+        .sidebar { background-color: #1a2235; border-right: 1px solid #2d3748; height: 100vh; position: sticky; top: 0; }
+        .card-stat { background-color: transparent; border: 1px solid #334155; border-radius: 12px; padding: 20px; display: flex; align-items: center; gap: 16px; }
+        .text-label { color: #94a3b8; font-size: 13px; font-weight: 600; }
+        .text-value { font-size: 26px; font-weight: 800; color: #ffffff; }
+        .highlight-blue { border: 1px solid #3b82f6 !important; }
+    </style>
+</head>
+<body class="flex">
+    <aside class="w-64 sidebar hidden md:flex flex-col p-6">
+        <h1 class="text-2xl font-black italic mb-10 text-white">TUF<span class="text-blue-500">AGENCY</span></h1>
+        <nav class="space-y-4 flex-1">
+            <button class="flex items-center w-full text-blue-400 bg-slate-800/20 p-3 rounded-lg border-l-4 border-blue-500">
+                <i data-lucide="layout-dashboard" class="mr-3 w-5 h-5"></i> Overview
+            </button>
+        </nav>
+        <button onclick="localStorage.clear(); location.href='index.html'" class="flex items-center text-slate-500 p-3 border-t border-slate-700 pt-6">Sair</button>
+    </aside>
+
+    <main class="flex-1 p-8">
+        <header class="flex justify-between items-center mb-10">
+            <h2 class="text-2xl font-bold uppercase">Relatórios TUF</h2>
+            <div class="h-10 w-10 bg-blue-600 rounded-full flex items-center justify-center font-bold" id="avatar-user">?</div>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="card-stat"><div><p class="text-label uppercase">Registro</p><h3 id="registros" class="text-value">0</h3></div></div>
+            <div class="card-stat"><div><p class="text-label uppercase">FTD</p><h3 id="ftd" class="text-value">0</h3></div></div>
+            <div class="card-stat"><div><p class="text-label uppercase">Depósito</p><h3 id="depositos" class="text-value">R$ 0,00</h3></div></div>
+            <div class="card-stat highlight-blue"><i data-lucide="hand-coins" class="w-10 h-10 text-blue-500"></i><div><p class="text-label text-blue-400 uppercase">CPA</p><h3 id="cpa" class="text-value">R$ 0,00</h3></div></div>
+        </div>
+    </main>
+
+    <script>
+        const firebaseConfig = { apiKey: "AIzaSyC-0AR8LPQJpdVcYp6QY8nUQJgBGr8oOy0", authDomain: "tufagency-6902e.firebaseapp.com", databaseURL: "https://tufagency-6902e-default-rtdb.firebaseio.com", projectId: "tufagency-6902e", storageBucket: "tufagency-6902e.firebasestorage.app", messagingSenderId: "34548749822", appId: "1:34548749822:web:74676530713d232a725caf" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const user = localStorage.getItem('usuarioLogado');
+        if(!user) location.href = 'index.html';
+        document.getElementById('avatar-user').innerText = user.charAt(0).toUpperCase();
+
+        db.ref('usuarios/' + user).on('value', s => {
+            const d = s.val();
+            if(d) {
+                let r=0, f=0, dep=0, cpa=0;
+                if(d.historico) {
+                    Object.values(d.historico).forEach(dia => {
+                        r += parseInt(dia.registros||0); f += parseInt(dia.ftd||0);
+                        dep += parseFloat(dia.depositos||0); cpa += parseFloat(dia.cpa||0);
+                    });
+                }
+                document.getElementById('registros').innerText = r;
+                document.getElementById('ftd').innerText = f;
+                document.getElementById('depositos').innerText = "R$ " + dep.toLocaleString('pt-BR');
+                document.getElementById('cpa').innerText = "R$ " + cpa.toLocaleString('pt-BR');
+            }
+        });
+        lucide.createIcons();
+    </script>
+</body>
+</html>
