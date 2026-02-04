@@ -244,22 +244,28 @@
 
 function salvarNovoInflu() {
     const emailRaw = document.getElementById('new-email').value.trim();
-    if(!emailRaw) return alert("ERRO: O E-mail é obrigatório para o login!");
-    
-    // Converte o e-mail para um formato que o Firebase aceite (chave do banco)
+    if(!emailRaw) return alert("E-mail obrigatório!");
+
+    // Chave técnica para o Firebase (Invisível para o usuário)
     const key = emailRaw.toLowerCase().replace(/\./g, '_').replace(/@/g, '_at_');
     
     const data = {
+        loginExibicao: emailRaw, // <-- Aqui salvamos o e-mail com pontos
         nome: document.getElementById('new-name').value.trim() || emailRaw,
         senha: document.getElementById('new-pass').value.trim() || "123",
         base: parseFloat(document.getElementById('new-base').value) || 0,
         acordoCPA: parseFloat(document.getElementById('new-cpa').value) || 0,
-        pix: document.getElementById('new-pix').value.trim() || "NÃO INFORMADO",
+        pix: document.getElementById('new-pix').value.trim(),
         pagamento: document.getElementById('pay-freq').value + " (" + document.getElementById('pay-day').value + ")",
-        dataInicio: "01/02/2026",
-        dataFim: "28/02/2026"
+        dataInicio: "01/01/2026",
+        dataFim: "31/12/2026"
     };
 
+    db.ref('usuarios/' + key).set(data).then(() => {
+        alert("CADASTRADO!");
+        mudarTab('gerenciar');
+    });
+}
     // Salva no Firebase
     db.ref('usuarios/' + key).set(data).then(() => {
         alert("✅ CADASTRADO COM SUCESSO!");
