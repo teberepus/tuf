@@ -60,31 +60,34 @@
         const db = firebase.database();
 
         function realizarLogin() {
-            const rawUser = document.getElementById('user').value.toLowerCase().trim();
-            const p = document.getElementById('pass').value;
-            
-            if(!rawUser || !p) return alert("Preencha todos os campos.");
+    // 1. Pega o que o cara digitou (ex: felipe.tuf@gmail.com)
+    const rawUser = document.getElementById('user').value.toLowerCase().trim();
+    const p = document.getElementById('pass').value;
+    
+    if(!rawUser || !p) return alert("Preencha todos os campos.");
 
-            // Limpeza inteligente igual ao Admin v4
-            const u = rawUser.replace(/\./g, '_').replace(/@/g, '_at_');
+    // 2. A MÁGICA: Converte os pontos e @ para bater com o banco
+    // Isso transforma "felipe.tuf@gmail.com" em "felipe_tuf_at_gmail_com"
+    const u = rawUser.replace(/\./g, '_').replace(/@/g, '_at_');
 
-            // Atalho rápido para Admin
-            if(rawUser === "admin" && p === "thaimorrowland2026") {
-                sessionStorage.setItem('adminLogado', 'true');
-                window.location.href = 'admin.html';
-                return;
-            }
+    // Atalho para o seu login de Admin
+    if(rawUser === "admin" && p === "thaimorrowland2026") {
+        sessionStorage.setItem('adminLogado', 'true');
+        window.location.href = 'admin.html';
+        return;
+    }
 
-            db.ref('usuarios/' + u).once('value', (s) => {
-                const d = s.val();
-                if(d && d.senha === p) {
-                    localStorage.setItem('usuarioLogado', u);
-                    window.location.href = 'dashboard.html';
-                } else { 
-                    alert("Usuário ou senha incorretos."); 
-                }
-            });
+    // 3. Busca no Firebase usando o nome convertido
+    db.ref('usuarios/' + u).once('value', (s) => {
+        const d = s.val();
+        if(d && d.senha === p) {
+            localStorage.setItem('usuarioLogado', u); // Salva o nome convertido para o Dash ler
+            window.location.href = 'dashboard.html';
+        } else { 
+            alert("Acesso negado: Usuário ou senha incorretos."); 
         }
+    });
+}
 
         function togglePass() {
             const input = document.getElementById('pass');
