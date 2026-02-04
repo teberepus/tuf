@@ -2,91 +2,152 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>TUF Agency - Dashboard Influencer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TUF Agency - Dashboard Afiliado</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        body { background-color: #0b0f1a; color: white; font-family: 'Inter', sans-serif; }
-        .sidebar { background-color: #161b28; border-right: 1px solid #2d3748; }
-        .card-stat { background: #1f2937; border: 1px solid #374151; border-radius: 20px; padding: 24px; transition: 0.3s; }
-        .card-stat:hover { border-color: #ef4444; transform: translateY(-3px); }
-        .btn-logout { color: #94a3b8; font-weight: 700; transition: 0.3s; }
-        .btn-logout:hover { color: #ef4444; }
-        .text-red-tuf { color: #ef4444; }
-        .bg-red-tuf { background-color: #ef4444; }
+        :root { --tuf-red: #E20613; --tuf-black: #000000; }
+        body { background-color: #FFFFFF; font-family: 'Inter', sans-serif; color: var(--tuf-black); margin: 0; letter-spacing: -0.5px; }
+        
+        .sidebar { background-color: #F8F8F8; border-right: 4px solid var(--tuf-black); height: 100vh; position: sticky; top: 0; }
+        
+        /* Tipografia Superbet */
+        .tuf-title { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -1.5px; }
+        
+        /* Cards Industriais */
+        .card-stat { 
+            background-color: #FFFFFF; border: 4px solid var(--tuf-black); 
+            padding: 24px; display: flex; align-items: center; gap: 20px; 
+            transition: 0.2s; box-shadow: 6px 6px 0px var(--tuf-black);
+        }
+        .card-stat:hover { transform: translate(-2px, -2px); box-shadow: 10px 10px 0px var(--tuf-red); }
+        .highlight-red { border-color: var(--tuf-red) !important; }
+        
+        .text-label { color: #64748b; font-size: 11px; font-weight: 900; text-transform: uppercase; font-style: italic; }
+        .text-value { font-size: 28px; font-weight: 900; color: var(--tuf-black); font-style: italic; line-height: 1; }
+        
+        /* Modal e UI */
+        #modal-filtro { background-color: rgba(0, 0, 0, 0.8); backdrop-filter: blur(4px); }
+        .modal-content { background-color: #FFFFFF; border: 6px solid var(--tuf-black); width: 450px; box-shadow: 20px 20px 0px var(--tuf-red); }
+        .input-data { border: 3px solid var(--tuf-black); padding: 14px; width: 100%; font-weight: 900; outline: none; }
+        
+        .btn-tuf { 
+            background-color: var(--tuf-red); color: white; font-weight: 900; font-style: italic; 
+            padding: 14px; text-transform: uppercase; border: 3px solid var(--tuf-black);
+            box-shadow: 4px 4px 0px var(--tuf-black); transition: 0.1s;
+        }
+        .btn-tuf:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px; }
+
+        /* Avatar Block (Igual ao Admin) */
+        .avatar-block { 
+            width: 45px; height: 45px; background-color: var(--tuf-red); 
+            display: flex; align-items: center; justify-content: center; 
+            font-weight: 900; font-style: italic; color: white; border: 3px solid var(--tuf-black);
+        }
     </style>
 </head>
-<body class="flex min-h-screen">
+<body class="flex">
 
-    <aside class="w-72 sidebar p-8 hidden md:flex flex-col">
-        <img src="icones/tuf.png" class="h-10 mb-12 w-fit">
+    <aside class="w-72 sidebar hidden md:flex flex-col p-8">
+        <img src="icones/tuf.png" class="h-12 mb-12 w-fit">
         <nav class="space-y-4 flex-1">
-            <button onclick="mudarTab('dash')" class="flex items-center w-full p-4 rounded-xl bg-red-tuf text-white font-black italic shadow-lg shadow-red-500/20">
+            <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest">Painel Principal</p>
+            <button onclick="mudarTab('overview')" id="btn-overview" class="flex items-center w-full bg-black text-white p-4 font-black italic text-sm border-l-8 border-red-600">
                 <i data-lucide="layout-dashboard" class="mr-3 w-5 h-5"></i> OVERVIEW
             </button>
-            <button onclick="mudarTab('perfil')" class="flex items-center w-full p-4 rounded-xl text-slate-400 hover:text-white font-bold transition">
-                <i data-lucide="user" class="mr-3 w-5 h-5"></i> MEU PERFIL
-            </button>
         </nav>
-        <button onclick="logout()" class="btn-logout flex items-center p-4 border-t border-slate-800">
-            <i data-lucide="log-out" class="mr-3 w-5 h-5"></i> SAIR
+        <button onclick="logout()" class="flex items-center text-gray-400 hover:text-red-600 p-4 transition border-t-2 border-gray-200 font-black italic text-sm">
+            <i data-lucide="log-out" class="mr-3 w-5 h-5"></i> SAIR DA CONTA
         </button>
     </aside>
 
-    <main class="flex-1 p-12">
-        <div id="secao-dash">
-            <header class="flex justify-between items-center mb-12">
-                <div>
-                    <h1 class="text-3xl font-black italic uppercase tracking-tighter">Bem-vindo, <span id="user-nome" class="text-red-red-tuf text-red-500">---</span></h1>
-                    <p class="text-slate-500 text-sm font-bold uppercase" id="att-horario">Atualização diária: ---</p>
-                </div>
-                <div class="h-12 w-12 bg-red-tuf rounded-2xl flex items-center justify-center font-black text-xl italic shadow-lg shadow-red-500/30" id="user-letra">?</div>
-            </header>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="card-stat">
-                    <img src="icones/rgst.svg" class="h-10 mb-4">
-                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Registros</p>
-                    <h2 id="reg" class="text-3xl font-black italic mt-1">0</h2>
-                </div>
-                <div class="card-stat">
-                    <img src="icones/FTD-BkwOULkh.svg" class="h-10 mb-4">
-                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">FTD Acumulado</p>
-                    <h2 id="ftd" class="text-3xl font-black italic mt-1">0</h2>
-                </div>
-                <div class="card-stat border-red-500/50">
-                    <img src="icones/cpa.svg" class="h-10 mb-4">
-                    <p class="text-[10px] font-bold text-red-500 uppercase tracking-widest">Saldo CPA</p>
-                    <h2 id="cpa" class="text-3xl font-black italic mt-1 text-red-500">R$ 0,00</h2>
-                </div>
-                <div class="card-stat bg-red-tuf border-none">
-                    <i data-lucide="wallet" class="text-white h-10 w-10 mb-4"></i>
-                    <p class="text-[10px] font-bold text-white/70 uppercase tracking-widest">Próximo Acerto</p>
-                    <h2 id="dia-pag" class="text-3xl font-black italic mt-1 text-white text-3xl">DIA --</h2>
+    <main class="flex-1 p-10">
+        <header class="flex justify-between items-center mb-10">
+            <h2 id="titulo-pagina" class="text-5xl tuf-title">OVERVIEW</h2>
+            <div class="relative">
+                <button onclick="toggleDropdown()" class="flex items-center gap-4 bg-white p-2 px-5 border-4 border-black hover:shadow-[4px_4px_0px_#000] transition">
+                    <span id="top-user-name" class="text-sm font-black italic uppercase">...</span>
+                    <div id="avatar-inicial" class="avatar-block text-xl">?</div>
+                </button>
+                <div id="dropdown" class="hidden absolute right-0 mt-4 w-56 bg-white border-4 border-black z-50 shadow-[10px_10px_0px_#E20613]">
+                    <button onclick="mudarTab('perfil')" class="flex items-center w-full p-5 text-xs font-black italic uppercase hover:bg-gray-100">
+                        <i data-lucide="user-circle" class="mr-3 w-5 h-5 text-red-600"></i> Meu Perfil
+                    </button>
+                    <button onclick="logout()" class="flex items-center w-full p-5 text-xs font-black italic uppercase text-red-600 hover:bg-gray-100 border-t-4 border-black">
+                        <i data-lucide="log-out" class="mr-3 w-5 h-5"></i> Encerrar Sessão
+                    </button>
                 </div>
             </div>
+        </header>
+
+        <div id="filtros-topo" class="mb-10 flex items-center justify-between">
+            <button onclick="abrirModalFiltro()" class="flex items-center gap-3 px-6 py-3 border-4 border-black font-black italic text-xs uppercase hover:bg-black hover:text-white transition">
+                <i data-lucide="calendar" class="w-5 h-5 text-red-600"></i>
+                <span id="periodo-exibicao">CARREGANDO PERÍODO...</span>
+            </button>
+            <div class="bg-black text-white px-4 py-2 tuf-title text-xs italic">TUF AGENCY v4</div>
         </div>
 
-        <div id="secao-perfil" class="hidden max-w-2xl">
-            <h2 class="text-4xl font-black italic uppercase mb-10 text-red-500">Meu <span class="text-white">Perfil</span></h2>
-            <div class="bg-slate-900 border border-slate-800 p-10 rounded-3xl space-y-6">
-                <div class="flex items-center gap-6 pb-6 border-b border-slate-800">
-                    <div class="h-20 w-20 bg-slate-800 rounded-2xl flex items-center justify-center text-3xl font-black text-red-500 border border-red-500/30">?</div>
-                    <div>
-                        <p id="perfil-nome" class="text-2xl font-black italic uppercase">---</p>
-                        <p class="text-red-500 font-bold text-xs uppercase">Acordo: R$ <span id="perfil-acordo">0</span> por FTD</p>
+        <div id="secao-overview" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="card-stat"><img src="icones/rgst.svg" class="h-14"><div><p class="text-label">Registros</p><h3 id="registros" class="text-value">0</h3></div></div>
+            <div class="card-stat"><img src="icones/FTD-BkwOULkh.svg" class="h-14"><div><p class="text-label">FTD Brutos</p><h3 id="ftd" class="text-value">0</h3></div></div>
+            <div class="card-stat highlight-red"><i data-lucide="shield-check" class="w-12 h-12 text-red-600"></i><div><p class="text-label text-red-600">QFTD (Qualificados)</p><h3 id="qftd" class="text-value text-red-600">0</h3></div></div>
+            
+            <div class="card-stat"><img src="icones/deposito-BqL6OVL2.svg" class="h-14"><div><p class="text-label">Receita Total</p><h3 id="depositos" class="text-value">R$ 0,00</h3></div></div>
+            <div class="card-stat"><img src="icones/cpa.svg" class="h-14"><div><p class="text-label">Comissão CPA</p><h3 id="cpa" class="text-value">R$ 0,00</h3></div></div>
+            
+            <div class="card-stat bg-black border-none shadow-[10px_10px_0px_#E20613]"><i data-lucide="wallet" class="w-12 h-12 text-red-600"></i><div><p class="text-label text-gray-400">Total a Receber</p><h3 id="total" class="text-value text-white">R$ 0,00</h3></div></div>
+        </div>
+
+        <div id="secao-perfil" class="hidden max-w-4xl mx-auto">
+            <div class="border-[8px] border-black p-12 text-center shadow-[20px_20px_0px_#E20613]">
+                <div id="avatar-perfil-grande" class="h-32 w-32 bg-red-600 border-4 border-black mx-auto mb-8 flex items-center justify-center text-5xl font-black italic text-white shadow-[8px_8px_0px_#000] uppercase">?</div>
+                <h2 class="text-5xl tuf-title mb-2"><span id="perfil-nome-grande">...</span></h2>
+                <p class="text-red-600 font-black italic uppercase tracking-widest text-sm mb-12">Influenciador Oficial TUF Agency</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                    <div class="p-6 border-4 border-black flex items-center gap-4">
+                        <i data-lucide="credit-card" class="w-8 h-8 text-red-600"></i>
+                        <div><p class="text-label">Chave PIX de Recebimento</p><p id="perfil-pix" class="font-black italic uppercase text-lg">---</p></div>
                     </div>
-                </div>
-                <div class="grid grid-cols-2 gap-6">
-                    <div><p class="text-[10px] font-bold text-slate-500 uppercase">Chave PIX Cadastrada</p><p id="perfil-pix" class="font-bold text-white mt-1 uppercase">---</p></div>
-                    <div><p class="text-[10px] font-bold text-slate-500 uppercase">Dia de Fechamento</p><p id="perfil-dia" class="font-bold text-white mt-1 uppercase">Todo dia --</p></div>
+                    <div class="p-6 border-4 border-black flex items-center gap-4">
+                        <i data-lucide="calendar-check" class="w-8 h-8 text-red-600"></i>
+                        <div><p class="text-label">Cronograma de Pagamento</p><p id="perfil-pag" class="font-black italic uppercase text-lg">---</p></div>
+                    </div>
+                    <div class="p-6 border-4 border-black flex items-center gap-4">
+                        <i data-lucide="zap" class="w-8 h-8 text-red-600"></i>
+                        <div><p class="text-label">Meu Acordo Atual</p><p id="perfil-acordo" class="font-black italic uppercase text-lg">R$ 0,00 por CPA</p></div>
+                    </div>
+                    <div class="p-6 border-4 border-black flex items-center gap-4">
+                        <i data-lucide="mail" class="w-8 h-8 text-red-600"></i>
+                        <div><p class="text-label">E-mail de Acesso</p><p id="perfil-email" class="font-black italic text-lg lowercase">---</p></div>
+                    </div>
                 </div>
             </div>
         </div>
     </main>
+
+    <div id="modal-filtro" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div class="modal-content p-10 relative">
+            <button onclick="fecharModalFiltro()" class="absolute top-6 right-6 text-black hover:text-red-600"><i data-lucide="x" class="w-8 h-8"></i></button>
+            <h3 class="text-3xl tuf-title mb-2">FILTRAR <span class="text-red-600">DATA</span></h3>
+            <p class="font-black italic text-gray-400 text-xs mb-10 uppercase">Escolha o período para recalcular os ganhos.</p>
+            <div class="space-y-6">
+                <div><label class="block text-[10px] font-black mb-2 uppercase italic">Data de Início</label><input type="date" id="modal-ini" class="input-data"></div>
+                <div><label class="block text-[10px] font-black mb-2 uppercase italic">Data de Término</label><input type="date" id="modal-fim" class="input-data"></div>
+            </div>
+            <div class="flex gap-4 mt-12">
+                <button onclick="fecharModalFiltro()" class="flex-1 border-4 border-black p-4 font-black italic uppercase">Cancelar</button>
+                <button onclick="aplicarFiltroLocal()" class="btn-tuf flex-1">APLICAR FILTRO</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="btn-tuf shadow-none border-none bottom-10">FILTROS APLICADOS COM SUCESSO!</div>
 
     <script>
         const firebaseConfig = { apiKey: "AIzaSyC-0AR8LPQJpdVcYp6QY8nUQJgBGr8oOy0", authDomain: "tufagency-6902e.firebaseapp.com", databaseURL: "https://tufagency-6902e-default-rtdb.firebaseio.com", projectId: "tufagency-6902e", storageBucket: "tufagency-6902e.firebasestorage.app", messagingSenderId: "34548749822", appId: "1:34548749822:web:74676530713d232a725caf" };
@@ -94,40 +155,75 @@
         const db = firebase.database();
 
         const user = localStorage.getItem('usuarioLogado');
-        if(!user) location.href = 'index.html';
+        if(!user) window.location.href = 'index.html';
 
-        // Puxa os dados do influenciador
-        db.ref('usuarios/' + user).on('value', s => {
+        // Interface Inicial
+        db.ref('usuarios/' + user).on('value', (s) => {
             const d = s.val();
             if(d) {
-                document.getElementById('user-nome').innerText = d.nome;
-                document.getElementById('perfil-nome').innerText = d.nome;
-                document.getElementById('user-letra').innerText = d.nome.charAt(0).toUpperCase();
-                document.getElementById('att-horario').innerText = d.horario;
-                document.getElementById('perfil-acordo').innerText = d.acordoCPA;
-                document.getElementById('perfil-pix').innerText = d.pix;
-                document.getElementById('perfil-dia').innerText = "TODO DIA " + d.pagamentoDia;
-                document.getElementById('dia-pag').innerText = "DIA " + d.pagamentoDia;
+                const inicial = d.nome ? d.nome.charAt(0).toUpperCase() : '?';
+                document.getElementById('avatar-inicial').innerText = inicial;
+                document.getElementById('avatar-perfil-grande').innerText = inicial;
+                document.getElementById('top-user-name').innerText = d.nome || user;
+                document.getElementById('perfil-nome-grande').innerText = d.nome || user;
+                
+                // Dados do Perfil
+                document.getElementById('perfil-pix').innerText = d.pix || 'NÃO CADASTRADO';
+                document.getElementById('perfil-pag').innerText = d.pagamento || 'NÃO DEFINIDO';
+                document.getElementById('perfil-acordo').innerText = "R$ " + (d.acordoCPA || 0).toFixed(2);
+                document.getElementById('perfil-email').innerText = user.replace(/_/g, '.');
 
-                let r=0, f=0, cpa=0;
+                // Lógica de Soma Inteligente (Conforme o novo Admin v4)
+                let reg=0, ftd=0, qftd=0, dep=0, cpa=0;
                 if(d.historico) {
                     Object.values(d.historico).forEach(dia => {
-                        r += parseInt(dia.registros||0);
-                        f += parseInt(dia.ftd||0);
-                        cpa += parseFloat(dia.cpa||0);
+                        reg += parseInt(dia.registros || 0);
+                        ftd += parseInt(dia.ftd || 0);
+                        qftd += parseInt(dia.qftd || 0);
+                        dep += (parseFloat(dia.depositos_qftd || 0) + parseFloat(dia.depositos_brutos || 0));
+                        cpa += parseFloat(dia.cpa || 0);
                     });
                 }
-                document.getElementById('reg').innerText = r;
-                document.getElementById('ftd').innerText = f;
+
+                document.getElementById('registros').innerText = reg;
+                document.getElementById('ftd').innerText = ftd;
+                document.getElementById('qftd').innerText = qftd;
+                document.getElementById('depositos').innerText = "R$ " + dep.toLocaleString('pt-BR', {minimumFractionDigits: 2});
                 document.getElementById('cpa').innerText = "R$ " + cpa.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                document.getElementById('total').innerText = "R$ " + cpa.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                
+                document.getElementById('periodo-exibicao').innerText = (d.dataInicio || "01/01/2026") + " - " + (d.dataFim || "31/01/2026");
+                document.getElementById('modal-ini').value = d.dataInicio ? d.dataInicio.split('/').reverse().join('-') : "2026-01-01";
+                document.getElementById('modal-fim').value = d.dataFim ? d.dataFim.split('/').reverse().join('-') : "2026-01-31";
             }
         });
 
-        function mudarTab(tab) {
-            document.getElementById('secao-dash').classList.toggle('hidden', tab !== 'dash');
-            document.getElementById('secao-perfil').classList.toggle('hidden', tab !== 'perfil');
+        function aplicarFiltroLocal() {
+            const di = document.getElementById('modal-ini').value.split('-').reverse().join('/');
+            const df = document.getElementById('modal-fim').value.split('-').reverse().join('/');
+            db.ref('usuarios/' + user).update({ dataInicio: di, dataFim: df }).then(() => {
+                fecharModalFiltro();
+                const t = document.getElementById("toast"); t.className = "show";
+                setTimeout(() => { t.className = t.className.replace("show", ""); }, 3000);
+            });
         }
-        function logout() { localStorage.clear(); location.href='index.html'; }
+
+        function abrirModalFiltro() { document.getElementById('modal-filtro').classList.remove('hidden'); }
+        function fecharModalFiltro() { document.getElementById('modal-filtro').classList.add('hidden'); }
+        function toggleDropdown() { document.getElementById('dropdown').classList.toggle('hidden'); }
+        function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+        function mudarTab(tab) {
+            document.getElementById('secao-overview').classList.toggle('hidden', tab !== 'overview');
+            document.getElementById('secao-perfil').classList.toggle('hidden', tab !== 'perfil');
+            document.getElementById('filtros-topo').classList.toggle('hidden', tab !== 'overview');
+            document.getElementById('titulo-pagina').innerText = tab === 'overview' ? 'OVERVIEW' : 'MEU PERFIL';
+            document.getElementById('dropdown').classList.add('hidden');
+            if(tab === 'overview') {
+                document.getElementById('btn-overview').classList.add('bg-black', 'text-white', 'border-l-8');
+            } else {
+                document.getElementById('btn-overview').classList.remove('bg-black', 'text-white', 'border-l-8');
+            }
+        }
         lucide.createIcons();
     </script>
 </body>
