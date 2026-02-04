@@ -2,91 +2,132 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TUF Agency - Dashboard</title>
+    <title>TUF Agency - Dashboard Influencer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        body { background-color: #0f172a; font-family: 'Inter', sans-serif; color: white; margin: 0; }
-        .sidebar { background-color: #1a2235; border-right: 1px solid #2d3748; height: 100vh; position: sticky; top: 0; }
-        .card-stat { background-color: transparent; border: 1px solid #334155; border-radius: 12px; padding: 20px; display: flex; align-items: center; gap: 16px; }
-        .text-label { color: #94a3b8; font-size: 13px; font-weight: 600; }
-        .text-value { font-size: 26px; font-weight: 800; color: #ffffff; }
-        .highlight-blue { border: 1px solid #3b82f6 !important; }
+        body { background-color: #0b0f1a; color: white; font-family: 'Inter', sans-serif; }
+        .sidebar { background-color: #161b28; border-right: 1px solid #2d3748; }
+        .card-stat { background: #1f2937; border: 1px solid #374151; border-radius: 20px; padding: 24px; transition: 0.3s; }
+        .card-stat:hover { border-color: #ef4444; transform: translateY(-3px); }
+        .btn-logout { color: #94a3b8; font-weight: 700; transition: 0.3s; }
+        .btn-logout:hover { color: #ef4444; }
+        .text-red-tuf { color: #ef4444; }
+        .bg-red-tuf { background-color: #ef4444; }
     </style>
 </head>
-<body class="flex">
-    <aside class="w-64 sidebar hidden md:flex flex-col p-6">
-        <h1 class="text-2xl font-black italic mb-10 text-white">TUF<span class="text-blue-500">AGENCY</span></h1>
+<body class="flex min-h-screen">
+
+    <aside class="w-72 sidebar p-8 hidden md:flex flex-col">
+        <img src="icones/tuf.png" class="h-10 mb-12 w-fit">
         <nav class="space-y-4 flex-1">
-            <button class="flex items-center w-full text-blue-400 bg-slate-800/20 p-3 rounded-lg border-l-4 border-blue-500">
-                <i data-lucide="layout-dashboard" class="mr-3 w-5 h-5"></i> Overview
+            <button onclick="mudarTab('dash')" class="flex items-center w-full p-4 rounded-xl bg-red-tuf text-white font-black italic shadow-lg shadow-red-500/20">
+                <i data-lucide="layout-dashboard" class="mr-3 w-5 h-5"></i> OVERVIEW
+            </button>
+            <button onclick="mudarTab('perfil')" class="flex items-center w-full p-4 rounded-xl text-slate-400 hover:text-white font-bold transition">
+                <i data-lucide="user" class="mr-3 w-5 h-5"></i> MEU PERFIL
             </button>
         </nav>
-        <button onclick="localStorage.clear(); location.href='index.html'" class="flex items-center text-slate-500 p-3 border-t border-slate-700 pt-6">Sair</button>
+        <button onclick="logout()" class="btn-logout flex items-center p-4 border-t border-slate-800">
+            <i data-lucide="log-out" class="mr-3 w-5 h-5"></i> SAIR
+        </button>
     </aside>
 
-    <main class="flex-1 p-8">
-        <header class="flex justify-between items-center mb-10">
-            <h2 class="text-2xl font-bold uppercase">Relatórios TUF</h2>
-            <div class="h-10 w-10 bg-blue-600 rounded-full flex items-center justify-center font-bold" id="avatar-user">?</div>
-        </header>
+    <main class="flex-1 p-12">
+        <div id="secao-dash">
+            <header class="flex justify-between items-center mb-12">
+                <div>
+                    <h1 class="text-3xl font-black italic uppercase tracking-tighter">Bem-vindo, <span id="user-nome" class="text-red-red-tuf text-red-500">---</span></h1>
+                    <p class="text-slate-500 text-sm font-bold uppercase" id="att-horario">Atualização diária: ---</p>
+                </div>
+                <div class="h-12 w-12 bg-red-tuf rounded-2xl flex items-center justify-center font-black text-xl italic shadow-lg shadow-red-500/30" id="user-letra">?</div>
+            </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    <div class="card-stat">
-        <img src="icones/rgst.svg" class="h-12">
-        <div><p class="text-label uppercase">Registro</p><h3 id="registros" class="text-value">0</h3></div>
-    </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="card-stat">
+                    <img src="icones/rgst.svg" class="h-10 mb-4">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Registros</p>
+                    <h2 id="reg" class="text-3xl font-black italic mt-1">0</h2>
+                </div>
+                <div class="card-stat">
+                    <img src="icones/FTD-BkwOULkh.svg" class="h-10 mb-4">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">FTD Acumulado</p>
+                    <h2 id="ftd" class="text-3xl font-black italic mt-1">0</h2>
+                </div>
+                <div class="card-stat border-red-500/50">
+                    <img src="icones/cpa.svg" class="h-10 mb-4">
+                    <p class="text-[10px] font-bold text-red-500 uppercase tracking-widest">Saldo CPA</p>
+                    <h2 id="cpa" class="text-3xl font-black italic mt-1 text-red-500">R$ 0,00</h2>
+                </div>
+                <div class="card-stat bg-red-tuf border-none">
+                    <i data-lucide="wallet" class="text-white h-10 w-10 mb-4"></i>
+                    <p class="text-[10px] font-bold text-white/70 uppercase tracking-widest">Próximo Acerto</p>
+                    <h2 id="dia-pag" class="text-3xl font-black italic mt-1 text-white text-3xl">DIA --</h2>
+                </div>
+            </div>
+        </div>
 
-    <div class="card-stat">
-        <img src="icones/FTD-BkwOULkh.svg" class="h-12">
-        <div><p class="text-label uppercase">FTD</p><h3 id="ftd" class="text-value">0</h3></div>
-    </div>
-
-    <div class="card-stat">
-        <img src="icones/deposito-BqL6OVL2.svg" class="h-12">
-        <div><p class="text-label uppercase">Depósito</p><h3 id="depositos" class="text-value">R$ 0,00</h3></div>
-    </div>
-
-    <div class="card-stat highlight-blue">
-        <img src="icones/cpa.svg" class="h-12">
-        <div><p class="text-label text-blue-400 uppercase">CPA</p><h3 id="cpa" class="text-value">R$ 0,00</h3></div>
-    </div>
-
-    <div class="card-stat">
-        <img src="icones/cprev.svg" class="h-12">
-        <div><p class="text-label uppercase">REV + CPA</p><h3 id="total" class="text-value">R$ 0,00</h3></div>
-    </div>
-</div>
+        <div id="secao-perfil" class="hidden max-w-2xl">
+            <h2 class="text-4xl font-black italic uppercase mb-10 text-red-500">Meu <span class="text-white">Perfil</span></h2>
+            <div class="bg-slate-900 border border-slate-800 p-10 rounded-3xl space-y-6">
+                <div class="flex items-center gap-6 pb-6 border-b border-slate-800">
+                    <div class="h-20 w-20 bg-slate-800 rounded-2xl flex items-center justify-center text-3xl font-black text-red-500 border border-red-500/30">?</div>
+                    <div>
+                        <p id="perfil-nome" class="text-2xl font-black italic uppercase">---</p>
+                        <p class="text-red-500 font-bold text-xs uppercase">Acordo: R$ <span id="perfil-acordo">0</span> por FTD</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-6">
+                    <div><p class="text-[10px] font-bold text-slate-500 uppercase">Chave PIX Cadastrada</p><p id="perfil-pix" class="font-bold text-white mt-1 uppercase">---</p></div>
+                    <div><p class="text-[10px] font-bold text-slate-500 uppercase">Dia de Fechamento</p><p id="perfil-dia" class="font-bold text-white mt-1 uppercase">Todo dia --</p></div>
+                </div>
+            </div>
+        </div>
     </main>
 
     <script>
         const firebaseConfig = { apiKey: "AIzaSyC-0AR8LPQJpdVcYp6QY8nUQJgBGr8oOy0", authDomain: "tufagency-6902e.firebaseapp.com", databaseURL: "https://tufagency-6902e-default-rtdb.firebaseio.com", projectId: "tufagency-6902e", storageBucket: "tufagency-6902e.firebasestorage.app", messagingSenderId: "34548749822", appId: "1:34548749822:web:74676530713d232a725caf" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+
         const user = localStorage.getItem('usuarioLogado');
         if(!user) location.href = 'index.html';
-        document.getElementById('avatar-user').innerText = user.charAt(0).toUpperCase();
 
+        // Puxa os dados do influenciador
         db.ref('usuarios/' + user).on('value', s => {
             const d = s.val();
             if(d) {
-                let r=0, f=0, dep=0, cpa=0;
+                document.getElementById('user-nome').innerText = d.nome;
+                document.getElementById('perfil-nome').innerText = d.nome;
+                document.getElementById('user-letra').innerText = d.nome.charAt(0).toUpperCase();
+                document.getElementById('att-horario').innerText = d.horario;
+                document.getElementById('perfil-acordo').innerText = d.acordoCPA;
+                document.getElementById('perfil-pix').innerText = d.pix;
+                document.getElementById('perfil-dia').innerText = "TODO DIA " + d.pagamentoDia;
+                document.getElementById('dia-pag').innerText = "DIA " + d.pagamentoDia;
+
+                let r=0, f=0, cpa=0;
                 if(d.historico) {
                     Object.values(d.historico).forEach(dia => {
-                        r += parseInt(dia.registros||0); f += parseInt(dia.ftd||0);
-                        dep += parseFloat(dia.depositos||0); cpa += parseFloat(dia.cpa||0);
+                        r += parseInt(dia.registros||0);
+                        f += parseInt(dia.ftd||0);
+                        cpa += parseFloat(dia.cpa||0);
                     });
                 }
-                document.getElementById('registros').innerText = r;
+                document.getElementById('reg').innerText = r;
                 document.getElementById('ftd').innerText = f;
-                document.getElementById('depositos').innerText = "R$ " + dep.toLocaleString('pt-BR');
-                document.getElementById('cpa').innerText = "R$ " + cpa.toLocaleString('pt-BR');
+                document.getElementById('cpa').innerText = "R$ " + cpa.toLocaleString('pt-BR', {minimumFractionDigits: 2});
             }
         });
+
+        function mudarTab(tab) {
+            document.getElementById('secao-dash').classList.toggle('hidden', tab !== 'dash');
+            document.getElementById('secao-perfil').classList.toggle('hidden', tab !== 'perfil');
+        }
+        function logout() { localStorage.clear(); location.href='index.html'; }
         lucide.createIcons();
     </script>
 </body>
