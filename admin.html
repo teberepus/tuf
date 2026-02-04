@@ -15,11 +15,7 @@
         .sidebar { background-color: #F8F8F8; border-right: 4px solid var(--tuf-black); }
         .tuf-input { border: 3px solid var(--tuf-black); border-radius: 0px; padding: 12px; width: 100%; font-weight: 900; text-transform: uppercase; }
         .tuf-input:focus { background-color: #FFF; outline: none; box-shadow: 6px 6px 0px var(--tuf-red); }
-        .btn-tuf { 
-            background-color: var(--tuf-red); color: white; font-weight: 900; font-style: italic;
-            text-transform: uppercase; padding: 18px; border-radius: 0px; transition: 0.1s;
-            border: 3px solid var(--tuf-black); box-shadow: 4px 4px 0px var(--tuf-black);
-        }
+        .btn-tuf { background-color: var(--tuf-red); color: white; font-weight: 900; font-style: italic; text-transform: uppercase; padding: 18px; border-radius: 0px; transition: 0.1s; border: 3px solid var(--tuf-black); box-shadow: 4px 4px 0px var(--tuf-black); }
         .btn-tuf:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--tuf-black); }
         .tab-active { background-color: var(--tuf-red) !important; color: white !important; border-left: 8px solid var(--tuf-black); }
         .card-admin { border: 4px solid var(--tuf-black); border-radius: 0px; box-shadow: 10px 10px 0px var(--tuf-black); }
@@ -65,55 +61,38 @@
                 <select id="select-influencer" class="tuf-input text-lg h-16" onchange="carregarAcordoParaLancamento()">
                     <option value="">-- SELECIONE --</option>
                 </select>
-
-                <div id="area-lancamento" class="mt-8 pt-8 border-t-4 border-black hidden">
+                <div id="area-lancamento" class="mt-8 pt-8 border-t-4 border-black hidden text-black">
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
-                        <div><label class="text-[10px] font-black uppercase">Registros</label><input type="number" id="val-reg" class="tuf-input"></div>
-                        <div><label class="text-[10px] font-black uppercase">QFTD (Conversão CPA)</label><input type="number" id="val-qftd" class="tuf-input" oninput="autoCalculo()"></div>
-                        <div><label class="text-[10px] font-black uppercase">FTDs Brutos (Total)</label><input type="number" id="val-ftd" class="tuf-input"></div>
-                        
-                        <div class="bg-gray-100 p-4 border-2 border-black">
-                            <label class="text-[10px] font-black uppercase text-red-600 italic">Receita QFTDs (Auto)</label>
-                            <input type="number" id="val-dep-qftd" class="tuf-input !border-red-600" readonly>
-                        </div>
-                        <div class="bg-gray-100 p-4 border-2 border-black">
-                            <label class="text-[10px] font-black uppercase text-red-600 italic">CPA Gerado (Auto)</label>
-                            <input type="number" id="val-cpa" class="tuf-input !border-red-600" readonly>
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-black uppercase">Receita FTDs Brutos (Manual)</label>
-                            <input type="number" id="val-dep-bruto" class="tuf-input" placeholder="R$ 0,00">
-                        </div>
+                        <div><label class="text-[10px] font-black uppercase">Registros</label><input type="number" id="val-reg" class="tuf-input" value="0"></div>
+                        <div><label class="text-[10px] font-black uppercase">QFTD (CPA)</label><input type="number" id="val-qftd" class="tuf-input" value="0" oninput="autoCalculo()"></div>
+                        <div><label class="text-[10px] font-black uppercase">FTD Bruto</label><input type="number" id="val-ftd" class="tuf-input" value="0"></div>
+                        <div class="bg-gray-100 p-4 border-2 border-black"><label class="text-[10px] font-black uppercase text-red-600 italic">Rec. QFTD</label><input type="number" id="val-dep-qftd" class="tuf-input !border-red-600" readonly></div>
+                        <div class="bg-gray-100 p-4 border-2 border-black"><label class="text-[10px] font-black uppercase text-red-600 italic">CPA</label><input type="number" id="val-cpa" class="tuf-input !border-red-600" readonly></div>
+                        <div><label class="text-[10px] font-black uppercase">Rec. FTD Bruto</label><input type="number" id="val-dep-bruto" class="tuf-input" value="0"></div>
                     </div>
                     <div class="mt-8 flex items-center justify-between bg-black p-6">
-                        <div class="text-white text-sm font-black italic uppercase">
-                            BASE: <span id="label-base" class="text-red-600">0</span> | CPA: <span id="label-cpa" class="text-red-600">0</span>
-                        </div>
-                        <button onclick="salvarLancamento()" class="btn-tuf px-12">LANÇAR NO PAINEL</button>
+                        <div class="text-white text-sm font-black italic uppercase">BASE: <span id="label-base" class="text-red-600">0</span> | CPA: <span id="label-cpa" class="text-red-600">0</span></div>
+                        <button onclick="salvarLancamento()" class="btn-tuf px-12">LANÇAR</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <div id="box-historico" class="hidden space-y-6">
-            <h1 class="text-5xl tuf-title">HISTÓRICO <span class="text-red-600">GERAL</span></h1>
+            <h1 class="text-5xl tuf-title text-black">HISTÓRICO <span class="text-red-600">GERAL</span></h1>
             <div class="card-admin overflow-hidden">
-                <table class="w-full text-left font-black uppercase italic text-[10px]">
-                    <thead class="bg-black text-white">
-                        <tr><th class="p-4">DATA</th><th class="p-4">INFLUENCER</th><th class="p-4 text-red-600">QFTD</th><th class="p-4">FTD</th><th class="p-4">RECEITA</th><th class="p-4 text-red-600">CPA</th></tr>
-                    </thead>
+                <table class="w-full text-left font-black uppercase italic text-[10px] text-black">
+                    <thead class="bg-black text-white"><tr><th class="p-4">DATA</th><th class="p-4">INFLUENCER</th><th class="p-4">QFTD</th><th class="p-4">FTD</th><th class="p-4">RECEITA</th><th class="p-4">CPA</th></tr></thead>
                     <tbody id="lista-historico-corpo"></tbody>
                 </table>
             </div>
         </div>
 
         <div id="box-gerenciar" class="hidden">
-            <h1 class="text-5xl tuf-title mb-8">GESTÃO <span class="text-red-600">INFLU</span></h1>
+            <h1 class="text-5xl tuf-title mb-8 text-black">GESTÃO <span class="text-red-600">INFLU</span></h1>
             <div class="card-admin overflow-hidden">
-                <table class="w-full text-left font-black uppercase italic text-[10px]">
-                    <thead class="bg-black text-white">
-                        <tr><th class="p-4">NOME</th><th class="p-4">LOGIN</th><th class="p-4">SENHA</th><th class="p-4">ACORDO</th><th class="p-4">PAGAMENTO</th><th class="p-4">AÇÃO</th></tr>
-                    </thead>
+                <table class="w-full text-left font-black uppercase italic text-[10px] text-black">
+                    <thead class="bg-black text-white"><tr><th class="p-4">NOME</th><th class="p-4">LOGIN</th><th class="p-4">SENHA</th><th class="p-4">ACORDO</th><th class="p-4">AÇÃO</th></tr></thead>
                     <tbody id="lista-corpo"></tbody>
                 </table>
             </div>
@@ -122,28 +101,28 @@
         <div id="box-criar" class="hidden max-w-4xl">
             <h1 class="text-5xl tuf-title mb-8 text-red-600">NOVO ACESSO</h1>
             <div class="card-admin p-10 space-y-6">
-                <div class="grid grid-cols-2 gap-6">
-                    <div><label class="text-xs font-black uppercase italic">Nome Influencer</label><input type="text" id="new-name" class="tuf-input"></div>
-                    <div><label class="text-xs font-black uppercase italic">E-mail (Login)</label><input type="email" id="new-email" class="tuf-input"></div>
-                    <div><label class="text-xs font-black uppercase italic">Senha</label><input type="text" id="new-pass" class="tuf-input"></div>
-                    <div><label class="text-xs font-black uppercase italic text-red-600">Base Depósito (Ex: 25)</label><input type="number" id="new-base" class="tuf-input"></div>
-                    <div><label class="text-xs font-black uppercase italic text-red-600">CPA (Ex: 70)</label><input type="number" id="new-cpa" class="tuf-input"></div>
-                    <div><label class="text-xs font-black uppercase italic">Chave PIX</label><input type="text" id="new-pix" class="tuf-input"></div>
+                <div class="grid grid-cols-2 gap-6 text-black">
+                    <div><label class="text-xs font-black italic">NOME</label><input type="text" id="new-name" class="tuf-input"></div>
+                    <div><label class="text-xs font-black italic">EMAIL (LOGIN)</label><input type="email" id="new-email" class="tuf-input"></div>
+                    <div><label class="text-xs font-black italic">SENHA</label><input type="text" id="new-pass" class="tuf-input"></div>
+                    <div><label class="text-xs font-black italic">BASE (R$)</label><input type="number" id="new-base" class="tuf-input"></div>
+                    <div><label class="text-xs font-black italic">CPA (R$)</label><input type="number" id="new-cpa" class="tuf-input"></div>
+                    <div><label class="text-xs font-black italic">PIX</label><input type="text" id="new-pix" class="tuf-input"></div>
                     <div class="col-span-2 grid grid-cols-2 gap-4 bg-gray-50 p-4 border-2 border-black">
-                        <div><label class="text-xs font-black italic">FREQUÊNCIA</label><select id="pay-freq" class="tuf-input" onchange="ajustarDias()"><option value="Semanal">SEMANAL</option><option value="Mensal">MENSAL</option></select></div>
+                        <div><label class="text-xs font-black italic">FREQ</label><select id="pay-freq" class="tuf-input" onchange="ajustarDias()"><option value="Semanal">SEMANAL</option><option value="Mensal">MENSAL</option></select></div>
                         <div><label class="text-xs font-black italic">DIA</label><select id="pay-day" class="tuf-input"></select></div>
                     </div>
                 </div>
-                <button onclick="salvarNovoInflu()" class="w-full btn-tuf">CADASTRAR NA TUF AGENCY</button>
+                <button onclick="salvarNovoInflu()" class="w-full btn-tuf">CADASTRAR</button>
             </div>
         </div>
 
         <div id="box-perfil" class="hidden text-center max-w-sm mx-auto">
-            <div class="border-[10px] border-black p-10 shadow-[15px_15px_0px_#E20613]">
+            <div class="border-[10px] border-black p-10 shadow-[15px_15px_0px_#E20613] text-black">
                 <div class="w-24 h-24 bg-red-600 border-4 border-black mx-auto mb-6 flex items-center justify-center text-white text-5xl font-black italic" id="prof-avatar">?</div>
-                <h2 id="perf-nome" class="text-4xl tuf-title mb-4">---</h2>
+                <h2 id="perf-nome" class="text-4xl tuf-title mb-4 italic">---</h2>
                 <div class="bg-black text-white p-3 tuf-title text-sm italic mb-6">ADMIN MASTER</div>
-                <p class="font-black italic uppercase">Gestão: <span id="perf-count" class="text-red-600">0</span> Ativos</p>
+                <p class="font-black italic uppercase italic">Gestão: <span id="perf-count" class="text-red-600">0</span> Ativos</p>
             </div>
         </div>
     </main>
@@ -161,13 +140,13 @@
             } else { alert("SENHA INCORRETA!"); }
         }
 
-        const currentAdmin = sessionStorage.getItem('adminUser') || "FELIPE_TUF";
         if(sessionStorage.getItem('adminLogado') === 'true') {
             document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('admin-display').innerText = currentAdmin;
-            document.getElementById('perf-nome').innerText = currentAdmin;
-            document.getElementById('side-avatar').innerText = currentAdmin.charAt(0);
-            document.getElementById('prof-avatar').innerText = currentAdmin.charAt(0);
+            const adm = sessionStorage.getItem('adminUser');
+            document.getElementById('admin-display').innerText = adm;
+            document.getElementById('perf-nome').innerText = adm;
+            document.getElementById('side-avatar').innerText = adm.charAt(0);
+            document.getElementById('prof-avatar').innerText = adm.charAt(0);
         }
 
         document.getElementById('data-global').valueAsDate = new Date();
@@ -179,35 +158,25 @@
                 const select = document.getElementById('select-influencer');
                 const histCorpo = document.getElementById('lista-historico-corpo');
                 
-                lista.innerHTML = '';
-                histCorpo.innerHTML = '';
+                lista.innerHTML = ''; histCorpo.innerHTML = '';
                 select.innerHTML = '<option value="">-- SELECIONE --</option>';
-                let count = 0;
-                
-                if(!s.exists()) {
-                     document.getElementById('perf-count').innerText = 0;
-                     return;
-                }
+                let count = 0; influsData = {};
+
+                if(!s.exists()) { document.getElementById('perf-count').innerText = 0; return; }
 
                 s.forEach(u => {
                     const d = u.val();
-                    influsData[u.key] = d;
+                    const key = u.key;
+                    influsData[key] = d;
                     count++;
                     
-                    lista.innerHTML += `<tr class="border-b-4 border-black hover:bg-gray-100"><td class="p-4 font-black text-red-600">${d.nome || 'Sem Nome'}</td><td class="p-4 font-black">${u.key}</td><td class="p-4 font-mono">${d.senha}</td><td class="p-4">B:${d.base}/C:${d.acordoCPA}</td><td class="p-4">${d.pagamento}</td><td class="p-4"><button onclick="excluir('${u.key}')" class="text-red-600"><i data-lucide="trash-2"></i></button></td></tr>`;
-                    select.innerHTML += `<option value="${u.key}">${(d.nome || u.key).toUpperCase()}</option>`;
+                    lista.innerHTML += `<tr class="border-b-4 border-black"><td class="p-4 font-black text-red-600">${d.nome || key}</td><td class="p-4">${key}</td><td class="p-4 font-mono">${d.senha}</td><td class="p-4">B:${d.base || 0}/C:${d.acordoCPA || 0}</td><td class="p-4"><button onclick="excluir('${key}')" class="text-red-600">🗑️</button></td></tr>`;
+                    select.innerHTML += `<option value="${key}">${(d.nome || key).toUpperCase()}</option>`;
 
                     if(d.historico) {
-                        Object.keys(d.historico).forEach(data => {
-                            const h = d.historico[data];
-                            histCorpo.innerHTML += `<tr class="border-b-2 border-black">
-                                <td class="p-3">${data.split('-').reverse().join('/')}</td>
-                                <td class="p-3 font-black text-red-600">${d.nome}</td>
-                                <td class="p-3 font-black">${h.qftd || 0}</td>
-                                <td class="p-3">${h.ftd || 0}</td>
-                                <td class="p-3">R$ ${(parseFloat(h.depositos_qftd||0) + parseFloat(h.depositos_brutos||0)).toFixed(2)}</td>
-                                <td class="p-3 font-black text-red-600">R$ ${parseFloat(h.cpa||0).toFixed(2)}</td>
-                            </tr>`;
+                        Object.keys(d.historico).forEach(dt => {
+                            const h = d.historico[dt];
+                            histCorpo.innerHTML += `<tr class="border-b-2 border-black"><td class="p-3">${dt}</td><td class="p-3 font-black text-red-600">${d.nome}</td><td class="p-3">${h.qftd || 0}</td><td class="p-3">${h.ftd || 0}</td><td class="p-3">R$ ${(parseFloat(h.depositos_qftd||0) + parseFloat(h.depositos_brutos||0)).toFixed(2)}</td><td class="p-3 text-red-600 font-black">R$ ${parseFloat(h.cpa||0).toFixed(2)}</td></tr>`;
                         });
                     }
                 });
@@ -237,81 +206,50 @@
         function salvarLancamento() {
             const id = document.getElementById('select-influencer').value;
             const data = document.getElementById('data-global').value;
-            if(!id) return alert("Selecione um influenciador");
-
-            db.ref('usuarios/'+id+'/historico/'+data).set({
+            if(!id) return alert("Selecione um influencer");
+            db.ref('usuarios/'+id+'/historico/'+data).update({
                 registros: parseInt(document.getElementById('val-reg').value)||0,
                 qftd: parseInt(document.getElementById('val-qftd').value)||0,
                 ftd: parseInt(document.getElementById('val-ftd').value)||0,
                 depositos_qftd: parseFloat(document.getElementById('val-dep-qftd').value)||0,
                 depositos_brutos: parseFloat(document.getElementById('val-dep-bruto').value)||0,
                 cpa: parseFloat(document.getElementById('val-cpa').value)||0
-            }).then(() => { 
-                alert("LANÇADO!"); 
-                document.getElementById('area-lancamento').classList.add('hidden');
-                document.getElementById('select-influencer').value = "";
-            });
+            }).then(() => { alert("LANÇADO!"); location.reload(); });
         }
 
         function salvarNovoInflu() {
-            const emailRaw = document.getElementById('new-email').value;
-            if(!emailRaw) return alert("E-mail é obrigatório!");
-            
-            const email = emailRaw.toLowerCase().trim().replace(/\s/g, '').replace(/\./g, '_');
+            const e = document.getElementById('new-email').value;
+            if(!e) return alert("Email obrigatório!");
+            const key = e.toLowerCase().trim().replace(/\./g, '_');
             const data = {
-                nome: document.getElementById('new-name').value.trim() || email,
-                senha: document.getElementById('new-pass').value.trim(),
+                nome: document.getElementById('new-name').value.trim() || key,
+                senha: document.getElementById('new-pass').value.trim() || "123",
                 base: parseFloat(document.getElementById('new-base').value)||0,
                 acordoCPA: parseFloat(document.getElementById('new-cpa').value)||0,
                 pix: document.getElementById('new-pix').value.trim(),
                 pagamento: document.getElementById('pay-freq').value + " (" + document.getElementById('pay-day').value + ")",
-                dataInicio: "01/01/2026",
-                dataFim: "31/12/2026"
+                dataInicio: "01/01/2026", dataFim: "31/12/2026"
             };
-            
-            if(!data.senha) return alert("Defina uma senha!");
-
-            db.ref('usuarios/'+email).set(data).then(() => { 
-                alert("CADASTRADO COM SUCESSO!"); 
-                mudarTab('gerenciar');
-                // Limpar campos
-                document.getElementById('new-email').value = "";
-                document.getElementById('new-pass').value = "";
-            });
+            db.ref('usuarios/'+key).set(data).then(() => { alert("CADASTRADO!"); location.reload(); });
         }
 
         function ajustarDias() {
-            const freq = document.getElementById('pay-freq').value;
-            const select = document.getElementById('pay-day');
-            select.innerHTML = '';
-            if(freq === 'Semanal') {
-                ['SEGUNDA', 'TERÇA', 'QUARTA', 'QUINTA', 'SEXTA', 'SÁBADO', 'DOMINGO'].forEach(d => select.innerHTML += `<option value="${d}">${d}</option>`);
-            } else {
-                for(let i=1; i<=31; i++) { select.innerHTML += `<option value="DIA ${i}">DIA ${i}</option>`; }
-            }
+            const f = document.getElementById('pay-freq').value;
+            const s = document.getElementById('pay-day'); s.innerHTML = '';
+            if(f === 'Semanal') { ['SEGUNDA', 'TERÇA', 'QUARTA', 'QUINTA', 'SEXTA', 'SÁBADO', 'DOMINGO'].forEach(d => s.innerHTML += `<option value="${d}">${d}</option>`); }
+            else { for(let i=1; i<=31; i++) { s.innerHTML += `<option value="DIA ${i}">DIA ${i}</option>`; } }
         }
 
-        function mudarTab(tab) {
-            ['lancar', 'historico', 'gerenciar', 'criar', 'perfil'].forEach(b => {
-                const element = document.getElementById('box-'+b);
-                if(element) element.classList.add('hidden');
-            });
-            document.getElementById('box-'+tab).classList.remove('hidden');
-            
-            ['lancar', 'historico', 'gerenciar', 'criar'].forEach(b => {
-                const btn = document.getElementById('btn-'+b);
-                if(btn) btn.classList.remove('tab-active');
-            });
-            const activeBtn = document.getElementById('btn-'+tab);
-            if(activeBtn) activeBtn.classList.add('tab-active');
+        function mudarTab(t) {
+            ['lancar', 'historico', 'gerenciar', 'criar', 'perfil'].forEach(b => document.getElementById('box-'+b).classList.add('hidden'));
+            document.getElementById('box-'+t).classList.remove('hidden');
+            ['lancar', 'historico', 'gerenciar', 'criar'].forEach(b => document.getElementById('btn-'+b).classList.remove('tab-active'));
+            if(t !== 'perfil') document.getElementById('btn-'+t).classList.add('tab-active');
             lucide.createIcons();
         }
 
         function excluir(id) { if(confirm("APAGAR?")) db.ref('usuarios/'+id).remove(); }
-        
-        ajustarDias();
-        carregarDados();
-        lucide.createIcons();
+        ajustarDias(); carregarDados(); lucide.createIcons();
     </script>
 </body>
 </html>
