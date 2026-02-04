@@ -6,116 +6,118 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        body { background-color: #0b0f1a; color: white; font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        .sidebar { background-color: #161b28; border-right: 1px solid #2d3748; }
-        input, select { background: #1f2937; border: 1px solid #374151; padding: 14px; border-radius: 12px; width: 100%; color: white; outline: none; transition: 0.3s; }
-        input:focus { border-color: #ef4444; box-shadow: 0 0 10px rgba(239, 68, 68, 0.2); }
-        .btn-primary { background-color: #ef4444; color: white; font-weight: 800; border-radius: 12px; transition: 0.3s; text-transform: uppercase; letter-spacing: 0.5px; }
-        .btn-primary:hover { background-color: #b91c1c; transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.4); }
-        .card-glass { background: rgba(31, 41, 55, 0.5); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); border-radius: 24px; }
-        #login-screen { background-color: #0b0f1a; position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; }
-        .table-row:hover { background: rgba(239, 68, 68, 0.05); }
+        body { background-color: #ffffff; color: #0f172a; font-family: 'Inter', sans-serif; }
+        .sidebar { background-color: #f8fafc; border-right: 1px solid #e2e8f0; }
+        .card-glass { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        input, select { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 14px; border-radius: 12px; width: 100%; color: #0f172a; outline: none; transition: 0.3s; }
+        input:focus { border-color: #ef4444; background: #ffffff; box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1); }
+        .btn-primary { background-color: #ef4444; color: white; font-weight: 800; border-radius: 12px; transition: 0.3s; text-transform: uppercase; }
+        .btn-primary:hover { background-color: #dc2626; transform: translateY(-2px); shadow: 0 10px 15px rgba(239, 68, 68, 0.3); }
+        #login-screen { background-color: #ffffff; position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; }
+        .active-tab { background-color: #ef4444 !important; color: white !important; box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3); }
     </style>
 </head>
 <body class="flex min-h-screen">
 
     <div id="login-screen">
-        <div class="w-full max-w-md p-10 card-glass text-center border-t-4 border-red-500">
-            <img src="icones/tuf.png" class="h-16 mx-auto mb-8">
-            <h2 class="text-xl font-black uppercase mb-8">Painel <span class="text-red-500">TUF</span> Master</h2>
+        <div class="w-full max-w-md p-10 card-glass text-center">
+            <img src="icones/tuf.png" class="h-24 mx-auto mb-10">
+            <h2 class="text-2xl font-black uppercase mb-8 tracking-tighter">Painel <span class="text-red-500">TUF</span> Master</h2>
             <div class="space-y-4 text-left">
-                <div>
-                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-2">Usuário Admin</label>
-                    <input type="text" id="admin-user" placeholder="Ex: felipe_tuf">
-                </div>
+                <input type="text" id="admin-user" placeholder="Usuário Admin">
                 <div class="relative">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-2">Senha de Acesso</label>
-                    <input type="password" id="admin-pass" placeholder="••••••••">
-                    <button onclick="togglePass('admin-pass')" class="absolute right-4 top-9 text-slate-500 hover:text-white"><i data-lucide="eye" class="w-4 h-4"></i></button>
+                    <input type="password" id="admin-pass" placeholder="Senha">
+                    <button onclick="togglePass('admin-pass')" class="absolute right-4 top-4 text-slate-400"><i data-lucide="eye" class="w-4 h-4"></i></button>
                 </div>
-                <button onclick="authAdmin()" class="w-full btn-primary p-4 mt-4 shadow-xl">Entrar no Sistema</button>
+                <button onclick="authAdmin()" class="w-full btn-primary p-4 mt-4">Entrar no Sistema</button>
             </div>
         </div>
     </div>
 
-    <aside class="w-72 sidebar p-8 hidden md:flex flex-col">
-        <img src="icones/tuf.png" class="h-12 mb-12 w-fit">
+    <aside class="w-80 sidebar p-8 hidden md:flex flex-col">
+        <img src="icones/tuf.png" class="h-16 mb-12 w-fit">
         <nav class="space-y-3 flex-1">
-            <button onclick="mudarTab('lancar')" id="tab-l" class="flex items-center w-full p-4 rounded-xl bg-red-500 text-white font-black text-sm transition shadow-lg shadow-red-500/20">
+            <button onclick="mudarTab('lancar')" id="tab-l" class="active-tab flex items-center w-full p-4 rounded-xl font-black text-xs transition">
                 <i data-lucide="zap" class="mr-3 w-5 h-5"></i> LANÇAMENTOS
             </button>
-            <button onclick="mudarTab('criar')" id="tab-c" class="flex items-center w-full p-4 rounded-xl text-slate-400 hover:text-white font-bold text-sm transition">
+            <button onclick="mudarTab('criar')" id="tab-c" class="flex items-center w-full p-4 rounded-xl text-slate-500 hover:bg-slate-100 font-black text-xs transition">
                 <i data-lucide="user-plus" class="mr-3 w-5 h-5"></i> NOVO INFLUENCER
             </button>
         </nav>
-        <div class="pt-6 border-t border-slate-800">
-            <p class="text-[10px] text-slate-500 font-bold uppercase mb-2">Logado como</p>
-            <p id="admin-name-display" class="font-bold text-red-500 uppercase tracking-tighter">---</p>
+
+        <div onclick="mudarTab('perfil-admin')" class="pt-6 border-t border-slate-200 cursor-pointer group">
+            <div class="flex items-center gap-3">
+                <div class="h-10 w-10 bg-red-500 rounded-xl flex items-center justify-center text-white font-black italic">F</div>
+                <div>
+                    <p id="admin-display" class="font-black text-sm uppercase group-hover:text-red-500 transition">---</p>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase">Ver Meu Perfil</p>
+                </div>
+            </div>
         </div>
     </aside>
 
     <main class="flex-1 p-12 overflow-y-auto">
         <div id="box-lancar">
             <div class="flex justify-between items-end mb-10">
-                <div>
-                    <h1 class="text-4xl font-black italic tracking-tighter uppercase">Painel <span class="text-red-500">TUF</span></h1>
-                    <p class="text-slate-500 font-medium">Controle simultâneo de performance e acordos.</p>
-                </div>
-                <div class="bg-slate-900 p-2 rounded-xl border border-slate-800 flex items-center gap-4">
-                    <i data-lucide="calendar" class="text-red-500 ml-2 w-4 h-4"></i>
-                    <input type="date" id="data-global" class="!mb-0 !p-1 !bg-transparent !border-none text-sm font-bold text-white">
-                </div>
+                <h1 class="text-4xl font-black italic tracking-tighter uppercase">Painel <span class="text-red-500">TUF</span></h1>
+                <input type="date" id="data-global" class="!mb-0 !p-2 !w-44 text-xs font-bold bg-white">
             </div>
 
-            <div class="card-glass overflow-hidden shadow-2xl">
+            <div class="card-glass overflow-hidden">
                 <table class="w-full text-left">
-                    <thead class="bg-red-600/10 text-[10px] text-red-500 font-black uppercase tracking-widest border-b border-red-500/20">
-                        <tr>
-                            <th class="p-6">Influenciador</th>
-                            <th class="p-6">Senha</th>
-                            <th class="p-6">Acordo</th>
-                            <th class="p-6">Pagamento</th>
-                            <th class="p-6 text-right">Ações</th>
-                        </tr>
+                    <thead class="bg-slate-50 text-[10px] text-slate-400 font-black uppercase tracking-widest border-b border-slate-100">
+                        <tr><th class="p-6">Influenciador</th><th class="p-6">Acordo</th><th class="p-6">Pagamento</th><th class="p-6 text-right">Ação</th></tr>
                     </thead>
                     <tbody id="tabela-influencers"></tbody>
                 </table>
             </div>
 
-            <div id="form-edicao" class="hidden mt-10 card-glass p-10 border-l-8 border-red-500 animate-in fade-in slide-in-from-bottom-4 duration-300">
-                <div class="flex justify-between items-center mb-8">
-                    <h3 class="text-2xl font-black italic uppercase">Atualizar <span id="user-selecionado" class="text-red-500"></span></h3>
-                    <div class="flex gap-4 items-center">
-                        <span class="text-[11px] font-bold text-slate-400">AGENDADO: <span id="horario-label" class="text-white">---</span></span>
-                        <button onclick="fecharEdicao()" class="p-2 hover:bg-slate-800 rounded-lg"><i data-lucide="x" class="w-5 h-5"></i></button>
-                    </div>
-                </div>
+            <div id="form-edicao" class="hidden mt-10 card-glass p-10 border-l-8 border-red-500">
+                <h3 class="text-2xl font-black italic mb-8 uppercase">Atualizar <span id="user-selecionado" class="text-red-500"></span></h3>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    <div><label class="label-tuf">Registros</label><input type="number" id="edit-reg" value="0"></div>
-                    <div><label class="label-tuf">QFTD (Soma CPA)</label><input type="number" id="edit-ftd" value="0" oninput="calcCPA()"></div>
-                    <div><label class="label-tuf">Depósitos (R$)</label><input type="number" id="edit-dep" value="0"></div>
-                    <div><label class="label-tuf text-red-500">CPA Total (R$)</label><input type="number" id="edit-cpa" value="0" class="!border-red-500 text-red-500 font-black"></div>
+                    <div><label class="text-[10px] font-black text-slate-400">Registros</label><input type="number" id="edit-reg" value="0"></div>
+                    <div><label class="text-[10px] font-black text-slate-400">QFTD</label><input type="number" id="edit-ftd" value="0" oninput="calcCPA()"></div>
+                    <div><label class="text-[10px] font-black text-slate-400">Depósitos</label><input type="number" id="edit-dep" value="0"></div>
+                    <div><label class="text-[10px] font-black text-red-500">CPA (R$)</label><input type="number" id="edit-cpa" value="0" class="!border-red-500 text-red-500 font-black"></div>
                 </div>
-                <button onclick="salvarDados()" class="w-full btn-primary p-5 mt-8 text-lg">Atualizar Painel Simultâneo</button>
+                <button onclick="salvarDados()" class="w-full btn-primary p-5 mt-8 text-lg shadow-xl shadow-red-500/20">Atualizar Simultâneo</button>
             </div>
         </div>
 
-        <div id="box-criar" class="hidden max-w-3xl">
-            <h2 class="text-4xl font-black italic uppercase mb-10">Novo <span class="text-red-500">Login</span></h2>
+        <div id="box-criar" class="hidden max-w-3xl mx-auto">
+            <h2 class="text-4xl font-black italic uppercase mb-10">Novo <span class="text-red-500">Acesso</span></h2>
             <div class="card-glass p-10 space-y-6">
                 <div class="grid grid-cols-2 gap-6">
-                    <div><label class="label-tuf">E-mail de Login</label><input type="email" id="new-email" placeholder="email@tuf.com"></div>
-                    <div><label class="label-tuf">Senha</label><input type="password" id="new-pass" placeholder="••••••••"></div>
-                    <div><label class="label-tuf">Nome Artístico</label><input type="text" id="new-name" placeholder="Preta Morais"></div>
-                    <div><label class="label-tuf">Acordo CPA (R$)</label><input type="number" id="new-acordo" placeholder="70.00"></div>
-                    <div><label class="label-tuf">Chave PIX</label><input type="text" id="new-pix" placeholder="Chave para repasse"></div>
-                    <div><label class="label-tuf">Dia de Pagamento</label><input type="number" id="new-day" placeholder="Ex: 22"></div>
+                    <div><label class="text-[10px] font-black">E-mail de Login</label><input type="email" id="new-email"></div>
+                    <div class="relative"><label class="text-[10px] font-black">Senha</label>
+                        <input type="password" id="new-pass"><button onclick="togglePass('new-pass')" class="absolute right-4 top-8 text-slate-400"><i data-lucide="eye" class="w-4 h-4"></i></button>
+                    </div>
+                    <div><label class="text-[10px] font-black">Link da Casa (Afiliado)</label><input type="text" id="new-link" placeholder="https://superbet.com/..."></div>
+                    <div><label class="text-[10px] font-black">Valor CPA (R$)</label><input type="number" id="new-acordo"></div>
+                    <div class="col-span-2"><label class="text-[10px] font-black">Seleção de Pagamento Inteligente</label>
+                        <select id="new-periodo">
+                            <option value="Semanal (Toda Quinta)">Semanal (Toda Quinta)</option>
+                            <option value="Quinzenal (A cada 15 dias)">Quinzenal (A cada 15 dias)</option>
+                            <option value="Mensal (Todo dia 20)">Mensal (Todo dia 20)</option>
+                            <option value="A cada 10 dias">A cada 10 dias</option>
+                        </select>
+                    </div>
                 </div>
-                <div><label class="label-tuf">Horário de Atualização Diária</label><input type="text" id="new-time" placeholder="Ex: Todo dia às 22h"></div>
-                <button onclick="criarInflu()" class="w-full btn-primary p-5 text-lg">Cadastrar Influencer Oficial</button>
+                <button onclick="criarInflu()" class="w-full btn-primary p-5">Cadastrar Influencer Oficial</button>
+            </div>
+        </div>
+
+        <div id="box-perfil-admin" class="hidden max-w-xl mx-auto text-center">
+            <div class="h-32 w-32 bg-red-500 rounded-3xl mx-auto mb-6 flex items-center justify-center text-white text-5xl font-black italic shadow-2xl">F</div>
+            <h2 id="admin-nome-grande" class="text-3xl font-black uppercase mb-2">---</h2>
+            <p class="text-red-500 font-bold uppercase tracking-widest text-xs mb-10">Administrador Master</p>
+            <div class="card-glass p-8">
+                <p class="text-slate-400 text-xs font-bold uppercase mb-2">Estatísticas da Minha Rede</p>
+                <h3 class="text-5xl font-black italic"><span id="total-influs">0</span></h3>
+                <p class="text-slate-500 text-[10px] font-bold uppercase mt-2">Influencers Ativos no Sistema</p>
             </div>
         </div>
     </main>
@@ -125,19 +127,19 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Autenticação Multi-Admin
         function authAdmin() {
-            const user = document.getElementById('admin-user').value.toLowerCase().trim();
-            const pass = document.getElementById('admin-pass').value;
-            if(user && pass === "thaimorrowland2026") {
-                sessionStorage.setItem('adminLogado', 'true');
-                sessionStorage.setItem('adminUser', user);
-                location.reload();
-            } else { alert("Acesso Negado!"); }
+            const u = document.getElementById('admin-user').value.toUpperCase().trim();
+            const p = document.getElementById('admin-pass').value;
+            if(p === "thaimorrowland2026") {
+                sessionStorage.setItem('adminLogado', 'true'); sessionStorage.setItem('adminUser', u); location.reload();
+            } else { alert("Senha incorreta!"); }
         }
+        
+        const adm = sessionStorage.getItem('adminUser') || "FELIPE_TUF";
         if(sessionStorage.getItem('adminLogado') === 'true') {
             document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('admin-name-display').innerText = sessionStorage.getItem('adminUser');
+            document.getElementById('admin-display').innerText = adm;
+            document.getElementById('admin-nome-grande').innerText = adm;
         }
 
         document.getElementById('data-global').valueAsDate = new Date();
@@ -146,31 +148,29 @@
         function carregar() {
             db.ref('usuarios').on('value', s => {
                 const t = document.getElementById('tabela-influencers'); t.innerHTML = '';
+                let count = 0;
                 s.forEach(u => {
-                    const d = u.val();
+                    const d = u.val(); count++;
                     t.innerHTML += `
-                        <tr onclick="abrirEdicao('${u.key}', ${d.acordoCPA}, '${d.horario}')" class="table-row border-b border-slate-800 transition cursor-pointer">
-                            <td class="p-6"><p class="font-black uppercase italic">${d.nome}</p><p class="text-[10px] text-slate-500">${u.key}</p></td>
-                            <td class="p-6 font-mono text-slate-400 text-xs">${d.senha}</td>
-                            <td class="p-6"><span class="bg-red-500/20 text-red-500 px-3 py-1 rounded-full text-[10px] font-black italic">R$ ${d.acordoCPA}</span></td>
-                            <td class="p-6"><p class="text-[10px] font-bold">PIX: ${d.pix}</p><p class="text-[9px] text-slate-500 uppercase">PAGAMENTO DIA ${d.pagamentoDia}</p></td>
-                            <td class="p-6 text-right"><button onclick="event.stopPropagation(); excluir('${u.key}')" class="text-slate-600 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td>
+                        <tr onclick="abrirEdicao('${u.key}', ${d.acordoCPA})" class="border-b border-slate-100 hover:bg-slate-50 transition cursor-pointer">
+                            <td class="p-6"><p class="font-black uppercase italic">${d.nome || u.key}</p><p class="text-[9px] text-slate-400">${u.key}</p></td>
+                            <td class="p-6 font-black text-red-500 text-xs">R$ ${d.acordoCPA}</td>
+                            <td class="p-6 text-[10px] font-bold text-slate-500 uppercase">${d.pagamentoDia}</td>
+                            <td class="p-6 text-right"><button onclick="event.stopPropagation(); excluir('${u.key}')" class="text-slate-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td>
                         </tr>`;
                 });
+                document.getElementById('total-influs').innerText = count;
                 lucide.createIcons();
             });
         }
 
-        function abrirEdicao(id, acordo, hora) {
+        function abrirEdicao(id, acordo) {
             userAtivo = id; acordoAtivo = acordo;
             document.getElementById('user-selecionado').innerText = id;
-            document.getElementById('horario-label').innerText = hora || "NÃO DEFINIDO";
             document.getElementById('form-edicao').classList.remove('hidden');
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
-
         function calcCPA() { document.getElementById('edit-cpa').value = (parseInt(document.getElementById('edit-ftd').value) || 0) * acordoAtivo; }
-
         function salvarDados() {
             const data = document.getElementById('data-global').value;
             db.ref('usuarios/'+userAtivo+'/historico/'+data).set({
@@ -178,31 +178,28 @@
                 ftd: parseInt(document.getElementById('edit-ftd').value)||0,
                 depositos: parseFloat(document.getElementById('edit-dep').value)||0,
                 cpa: parseFloat(document.getElementById('edit-cpa').value)||0
-            }).then(() => { alert("Simultâneo Atualizado!"); document.getElementById('form-edicao').classList.add('hidden'); });
+            }).then(() => { alert("Atualizado!"); document.getElementById('form-edicao').classList.add('hidden'); });
         }
-
         function criarInflu() {
             const email = document.getElementById('new-email').value.toLowerCase().trim().replace(/\./g, '_');
             const data = {
                 senha: document.getElementById('new-pass').value.trim(),
-                nome: document.getElementById('new-name').value.trim(),
+                nome: email,
+                linkCasa: document.getElementById('new-link').value.trim(),
                 acordoCPA: parseFloat(document.getElementById('new-acordo').value)||0,
-                pix: document.getElementById('new-pix').value.trim(),
-                pagamentoDia: document.getElementById('new-day').value.trim(),
-                horario: document.getElementById('new-time').value.trim()
+                pagamentoDia: document.getElementById('new-periodo').value
             };
-            if(!email || !data.senha) return alert("E-mail e Senha obrigatórios!");
-            db.ref('usuarios/'+email).set(data).then(() => { alert("Influencer Registrado!"); location.reload(); });
+            db.ref('usuarios/'+email).set(data).then(() => location.reload());
         }
-
         function togglePass(id) { const i = document.getElementById(id); i.type = i.type === 'password' ? 'text' : 'password'; }
         function mudarTab(tab) {
-            document.getElementById('box-lancar').classList.toggle('hidden', tab !== 'lancar');
-            document.getElementById('box-criar').classList.toggle('hidden', tab !== 'criar');
-            document.getElementById('tab-l').className = tab === 'lancar' ? 'flex items-center w-full p-4 rounded-xl bg-red-500 text-white font-black text-sm' : 'flex items-center w-full p-4 rounded-xl text-slate-400 hover:text-white font-bold text-sm';
-            document.getElementById('tab-c').className = tab === 'criar' ? 'flex items-center w-full p-4 rounded-xl bg-red-500 text-white font-black text-sm' : 'flex items-center w-full text-slate-400 hover:text-white font-bold text-sm';
+            const tabs = ['lancar', 'criar', 'perfil-admin'];
+            tabs.forEach(t => document.getElementById('box-'+t).classList.add('hidden'));
+            document.getElementById('box-'+tab).classList.remove('hidden');
+            document.getElementById('tab-l').className = tab === 'lancar' ? 'active-tab flex items-center w-full p-4 rounded-xl font-black text-xs transition' : 'flex items-center w-full p-4 rounded-xl text-slate-500 hover:bg-slate-100 font-black text-xs transition';
+            document.getElementById('tab-c').className = tab === 'criar' ? 'active-tab flex items-center w-full p-4 rounded-xl font-black text-xs transition' : 'flex items-center w-full p-4 rounded-xl text-slate-500 hover:bg-slate-100 font-black text-xs transition';
         }
-        function excluir(id) { if(confirm("Deseja apagar influenciador?")) db.ref('usuarios/'+id).remove(); }
+        function excluir(id) { if(confirm("Apagar influenciador?")) db.ref('usuarios/'+id).remove(); }
         function fecharEdicao() { document.getElementById('form-edicao').classList.add('hidden'); }
         carregar();
         lucide.createIcons();
