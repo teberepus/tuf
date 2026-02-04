@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>TUF Agency - Admin Master v2</title>
+    <title>TUF Agency - Admin Master</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database-compat.js"></script>
@@ -11,190 +11,96 @@
     <style>
         body { background-color: #0f172a; color: white; font-family: 'Inter', sans-serif; }
         .sidebar { background-color: #1a2235; border-right: 1px solid #2d3748; }
-        .tab-btn { padding: 12px 24px; border-bottom: 2px solid transparent; transition: 0.3s; color: #94a3b8; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; }
-        .tab-btn.active { border-color: #3b82f6; color: #3b82f6; background-color: #1e293b; }
         input, select { background: #1e293b; border: 1px solid #334155; padding: 12px; border-radius: 8px; width: 100%; color: white; margin-bottom: 15px; outline: none; }
-        input:focus { border-color: #3b82f6; }
         .badge { background: #a3e635; color: #0f172a; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; }
         #login-admin-screen { background-color: #0f172a; position: fixed; inset: 0; z-index: 999; display: flex; align-items: center; justify-content: center; }
-        /* Estilos da nova tabela */
-        .admin-table th { background-color: #1e293b; color: #94a3b8; font-size: 10px; text-transform: uppercase; padding: 12px; border-bottom: 1px solid #334155; }
-        .admin-table td { padding: 12px; border-bottom: 1px solid #334155; font-size: 12px; }
-        .admin-table tr:hover { background-color: #243147; cursor: pointer; }
     </style>
 </head>
 <body class="flex min-h-screen">
-
     <div id="login-admin-screen">
-        <div class="w-full max-w-sm p-8 bg-[#1a2235] rounded-3xl border border-slate-700 shadow-2xl">
-            <img src="https://res.cloudinary.com/dsreg6hmo/image/upload/v1767891428/BetBoard/Photos/gpkghm2vdoohymfufbuw.png" class="h-6 mx-auto mb-8">
-            <h2 class="text-xs font-bold text-center uppercase tracking-widest text-slate-500 mb-6">Acesso Administrativo</h2>
-            <input type="password" id="admin-pass-input" placeholder="Digite a senha admin" class="text-center">
-            <button onclick="verificarSenhaAdmin()" class="w-full bg-blue-600 hover:bg-blue-500 p-4 rounded-xl font-bold uppercase text-xs transition">Entrar no Painel</button>
+        <div class="w-full max-w-sm p-8 bg-[#1a2235] rounded-3xl border border-slate-700">
+            <h1 class="text-2xl font-black italic text-center mb-8">TUF<span class="text-blue-500">ADMIN</span></h1>
+            <input type="password" id="admin-pass-input" placeholder="Senha Mestre" class="text-center">
+            <button onclick="verificarSenha()" class="w-full bg-blue-600 p-4 rounded-xl font-bold uppercase text-xs">Entrar</button>
         </div>
     </div>
 
     <aside class="w-64 sidebar p-6 hidden md:flex flex-col">
-        <img src="https://res.cloudinary.com/dsreg6hmo/image/upload/v1767891428/BetBoard/Photos/gpkghm2vdoohymfufbuw.png" class="h-6 mb-10 w-fit">
+        <h1 class="text-xl font-black italic mb-10 text-blue-500">TUF AGENCY</h1>
         <nav class="space-y-2">
-            <button onclick="mudarTab('lancar')" id="btn-tab-l" class="flex items-center w-full text-blue-400 p-3 rounded-lg bg-slate-800/50 border-l-4 border-blue-500 font-bold text-sm">
-                <i data-lucide="line-chart" class="mr-3 w-4 h-4"></i> Lançamentos
-            </button>
-            <button onclick="mudarTab('criar')" id="btn-tab-c" class="flex items-center w-full text-slate-400 p-3 rounded-lg hover:text-white transition font-bold text-sm">
-                <i data-lucide="user-plus" class="mr-3 w-4 h-4"></i> Criar Login
-            </button>
+            <button onclick="mudarTab('lancar')" class="flex items-center w-full text-blue-400 p-3 rounded-lg bg-slate-800/50 border-l-4 border-blue-500 font-bold text-sm">Lançamentos</button>
+            <button onclick="mudarTab('criar')" class="flex items-center w-full text-slate-400 p-3 rounded-lg hover:text-white font-bold text-sm">Criar Login</button>
         </nav>
     </aside>
 
     <main class="flex-1 p-10">
         <div id="box-lancar">
             <div class="flex justify-between items-center mb-8">
-                <div>
-                    <h2 class="text-2xl font-bold">Painel de Gerenciamento</h2>
-                    <p class="text-slate-500 text-sm">Visualize as senhas e selecione um influenciador para lançar dados.</p>
-                </div>
-                <div class="text-right">
-                    <p class="text-[10px] font-bold text-slate-500 uppercase">Data de Lançamento</p>
-                    <input type="date" id="data-global" class="!mb-0 !p-2 !w-40 text-xs">
-                </div>
+                <h2 class="text-2xl font-bold uppercase">Gerenciamento TUF</h2>
+                <input type="date" id="data-global" class="!mb-0 !p-2 !w-40 text-xs">
             </div>
-
-            <div class="mb-10 overflow-hidden bg-slate-800/20 rounded-2xl border border-slate-700 shadow-xl">
-                <table class="w-full admin-table">
-                    <thead>
-                        <tr>
-                            <th>Influenciador</th>
-                            <th>Senha de Acesso</th>
-                            <th>Status</th>
-                            <th class="text-right">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabela-influencers">
-                        </tbody>
+            <div class="bg-slate-800/20 rounded-2xl border border-slate-700 overflow-hidden mb-10">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-slate-800 text-slate-400"><tr><th class="p-4">Influencer</th><th class="p-4">Senha</th><th class="p-4 text-right">Ação</th></tr></thead>
+                    <tbody id="tabela-influencers"></tbody>
                 </table>
             </div>
-
             <div id="form-edicao" class="hidden bg-slate-800/40 border border-blue-500/30 p-8 rounded-2xl">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-lg font-bold">Lançar para: <span id="user-selecionado" class="text-blue-400 uppercase"></span></h3>
-                    <button onclick="fecharEdicao()" class="text-slate-500 hover:text-white text-xs uppercase font-bold">Cancelar ✕</button>
-                </div>
+                <h3 class="text-lg font-bold mb-6">Lançar para: <span id="user-selecionado" class="text-blue-400 uppercase"></span></h3>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div><label class="text-[10px] text-slate-500 font-bold uppercase">Registros</label><input type="number" id="edit-reg" value="0"></div>
-                    <div><label class="text-[10px] text-slate-500 font-bold uppercase">FTDs</label><input type="number" id="edit-ftd" value="0"></div>
-                    <div><label class="text-[10px] text-slate-500 font-bold uppercase">Depósitos (R$)</label><input type="number" id="edit-dep" value="0"></div>
-                    <div><label class="text-[10px] text-slate-500 font-bold uppercase">CPA (R$)</label><input type="number" id="edit-cpa" value="0"></div>
+                    <div><label class="text-[10px] text-slate-500 font-bold">REGISTROS</label><input type="number" id="edit-reg" value="0"></div>
+                    <div><label class="text-[10px] text-slate-500 font-bold">FTDs</label><input type="number" id="edit-ftd" value="0"></div>
+                    <div><label class="text-[10px] text-slate-500 font-bold">DEPÓSITOS</label><input type="number" id="edit-dep" value="0"></div>
+                    <div><label class="text-[10px] text-slate-500 font-bold">CPA</label><input type="number" id="edit-cpa" value="0"></div>
                 </div>
-                <button onclick="salvarNoHistorico()" class="w-full bg-green-600 hover:bg-green-500 p-4 rounded-xl font-bold transition mt-4 uppercase text-sm">Confirmar Lançamento Diário</button>
+                <button onclick="salvarHistorico()" class="w-full bg-green-600 p-4 rounded-xl font-bold uppercase mt-4">Salvar Dados</button>
             </div>
         </div>
-
         <div id="box-criar" class="hidden max-w-xl">
-            <h2 class="text-2xl font-bold mb-6">Novo Influenciador</h2>
-            <div class="bg-slate-800/20 p-8 rounded-2xl border border-slate-700">
-                <label class="text-[10px] text-slate-500 font-bold uppercase">Nome de Usuário</label>
-                <input type="text" id="new-user" placeholder="Ex: rayssa_costa">
-                <label class="text-[10px] text-slate-500 font-bold uppercase">Senha Inicial</label>
-                <input type="password" id="new-pass" placeholder="Ex: superbet2026">
-                <button onclick="criarUsuario()" class="w-full bg-blue-600 hover:bg-blue-500 p-4 rounded-xl font-bold transition uppercase mt-4">Criar Acesso</button>
-            </div>
+            <h2 class="text-2xl font-bold mb-6">Novo Influencer</h2>
+            <input type="text" id="new-user" placeholder="Login">
+            <input type="password" id="new-pass" placeholder="Senha">
+            <button onclick="criarUsuario()" class="w-full bg-blue-600 p-4 rounded-xl font-bold uppercase mt-4">Criar</button>
         </div>
     </main>
 
     <script>
-        const senhaMestre = "thaimorrowland2026";
-        
-        if(sessionStorage.getItem('adminLogado') === 'true') {
-            document.getElementById('login-admin-screen').style.display = 'none';
-        }
-
-        function verificarSenhaAdmin() {
-            const senhaDigitada = document.getElementById('admin-pass-input').value;
-            if(senhaDigitada === senhaMestre) {
-                sessionStorage.setItem('adminLogado', 'true');
-                document.getElementById('login-admin-screen').style.display = 'none';
-            } else {
-                alert("Senha incorreta!");
-            }
-        }
-
-        const firebaseConfig = { apiKey: "AIzaSyC0oiw7obzsGDBvDr_enJQ1eNHmgPkwNA8", authDomain: "nexagency-84caa.firebaseapp.com", databaseURL: "https://nexagency-84caa-default-rtdb.firebaseio.com", projectId: "nexagency-84caa", storageBucket: "nexagency-84caa.firebasestorage.app", messagingSenderId: "691404707224", appId: "1:691404707224:web:8fed7daf6b4c7c9f8347ed" };
+        const firebaseConfig = { apiKey: "AIzaSyC-0AR8LPQJpdVcYp6QY8nUQJgBGr8oOy0", authDomain: "tufagency-6902e.firebaseapp.com", databaseURL: "https://tufagency-6902e-default-rtdb.firebaseio.com", projectId: "tufagency-6902e", storageBucket: "tufagency-6902e.firebasestorage.app", messagingSenderId: "34548749822", appId: "1:34548749822:web:74676530713d232a725caf" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        if(sessionStorage.getItem('adminLogado') === 'true') document.getElementById('login-admin-screen').style.display = 'none';
+        function verificarSenha() { if(document.getElementById('admin-pass-input').value === "thaimorrowland2026") { sessionStorage.setItem('adminLogado', 'true'); location.reload(); } }
+
         document.getElementById('data-global').valueAsDate = new Date();
-
-        function mudarTab(tab) {
-            document.getElementById('box-lancar').classList.toggle('hidden', tab !== 'lancar');
-            document.getElementById('box-criar').classList.toggle('hidden', tab !== 'criar');
-            document.getElementById('btn-tab-l').className = tab === 'lancar' ? 'flex items-center w-full text-blue-400 p-3 rounded-lg bg-slate-800/50 border-l-4 border-blue-500 font-bold text-sm' : 'flex items-center w-full text-slate-400 p-3 rounded-lg hover:text-white transition font-bold text-sm';
-            document.getElementById('btn-tab-c').className = tab === 'criar' ? 'flex items-center w-full text-blue-400 p-3 rounded-lg bg-slate-800/50 border-l-4 border-blue-500 font-bold text-sm' : 'flex items-center w-full text-slate-400 p-3 rounded-lg hover:text-white transition font-bold text-sm';
-            if(tab === 'lancar') carregarCards();
-        }
-
-        function carregarCards() {
+        function carregar() {
             db.ref('usuarios').once('value', s => {
-                const tabela = document.getElementById('tabela-influencers');
-                tabela.innerHTML = '';
+                const t = document.getElementById('tabela-influencers'); t.innerHTML = '';
                 s.forEach(u => {
-                    const dados = u.val();
-                    tabela.innerHTML += `
-                        <tr onclick="abrirEdicao('${u.key}')">
-                            <td class="font-bold text-blue-400 uppercase tracking-tighter">${u.key}</td>
-                            <td class="font-mono text-slate-400">${dados.senha}</td>
-                            <td><span class="badge">ATIVO</span></td>
-                            <td class="text-right">
-                                <button onclick="event.stopPropagation(); excluirInfluencer('${u.key}')" class="text-red-500 hover:text-red-400 transition">
-                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
+                    t.innerHTML += `<tr onclick="abrirEdicao('${u.key}')" class="border-t border-slate-700 hover:bg-slate-700/30 cursor-pointer">
+                        <td class="p-4 font-bold text-blue-400 uppercase">${u.key}</td><td class="p-4 text-slate-400">${u.val().senha}</td>
+                        <td class="p-4 text-right"><button onclick="event.stopPropagation(); excluir('${u.key}')" class="text-red-500">Excluir</button></td></tr>`;
                 });
-                lucide.createIcons();
             });
         }
-
-        let usuarioSelecionado = "";
-        function abrirEdicao(u) {
-            usuarioSelecionado = u;
-            document.getElementById('user-selecionado').innerText = u;
-            document.getElementById('form-edicao').classList.remove('hidden');
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        let sel = "";
+        function abrirEdicao(u) { sel = u; document.getElementById('user-selecionado').innerText = u; document.getElementById('form-edicao').classList.remove('hidden'); }
+        function salvarHistorico() {
+            const d = document.getElementById('data-global').value;
+            db.ref('usuarios/'+sel+'/historico/'+d).set({
+                registros: parseInt(document.getElementById('edit-reg').value)||0,
+                ftd: parseInt(document.getElementById('edit-ftd').value)||0,
+                depositos: parseFloat(document.getElementById('edit-dep').value)||0,
+                cpa: parseFloat(document.getElementById('edit-cpa').value)||0
+            }).then(() => { alert("Salvo!"); document.getElementById('form-edicao').classList.add('hidden'); });
         }
-
-        function fecharEdicao() { document.getElementById('form-edicao').classList.add('hidden'); }
-
-        function salvarNoHistorico() {
-            const data = document.getElementById('data-global').value;
-            if(!usuarioSelecionado || !data) return alert("Selecione a data!");
-            db.ref('usuarios/' + usuarioSelecionado + '/historico/' + data).set({
-                registros: parseInt(document.getElementById('edit-reg').value) || 0,
-                ftd: parseInt(document.getElementById('edit-ftd').value) || 0,
-                depositos: parseFloat(document.getElementById('edit-dep').value) || 0,
-                cpa: parseFloat(document.getElementById('edit-cpa').value) || 0
-            }).then(() => {
-                alert("Sucesso: Dados de " + data + " salvos!");
-                fecharEdicao();
-            });
-        }
-
         function criarUsuario() {
             const u = document.getElementById('new-user').value.toLowerCase().trim();
             const p = document.getElementById('new-pass').value;
-            if(!u || !p) return alert("Dados incompletos!");
-            db.ref('usuarios/' + u).set({ senha: p, dataInicio: "01/01/2026", dataFim: "31/12/2026" })
-            .then(() => { alert("Influenciador " + u + " cadastrado!"); mudarTab('lancar'); });
+            db.ref('usuarios/'+u).set({ senha: p, dataInicio: "01/01/2026", dataFim: "31/12/2026" }).then(() => location.reload());
         }
-
-        function excluirInfluencer(u) {
-            if(confirm("Deseja realmente excluir " + u + "?")) {
-                db.ref('usuarios/' + u).remove().then(() => carregarCards());
-            }
-        }
-
-        carregarCards();
-        lucide.createIcons();
+        function mudarTab(tab) { document.getElementById('box-lancar').classList.toggle('hidden', tab !== 'lancar'); document.getElementById('box-criar').classList.toggle('hidden', tab !== 'criar'); }
+        carregar();
     </script>
 </body>
 </html>
