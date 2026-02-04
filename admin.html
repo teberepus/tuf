@@ -178,17 +178,24 @@
                 const lista = document.getElementById('lista-corpo');
                 const select = document.getElementById('select-influencer');
                 const histCorpo = document.getElementById('lista-historico-corpo');
+                
                 lista.innerHTML = '';
                 histCorpo.innerHTML = '';
                 select.innerHTML = '<option value="">-- SELECIONE --</option>';
                 let count = 0;
                 
+                if(!s.exists()) {
+                     document.getElementById('perf-count').innerText = 0;
+                     return;
+                }
+
                 s.forEach(u => {
                     const d = u.val();
                     influsData[u.key] = d;
                     count++;
-                    lista.innerHTML += `<tr class="border-b-4 border-black hover:bg-gray-100"><td class="p-4 font-black text-red-600">${d.nome}</td><td class="p-4 font-black">${u.key}</td><td class="p-4 font-mono">${d.senha}</td><td class="p-4">B:${d.base}/C:${d.acordoCPA}</td><td class="p-4">${d.pagamento}</td><td class="p-4"><button onclick="excluir('${u.key}')" class="text-red-600"><i data-lucide="trash-2"></i></button></td></tr>`;
-                    select.innerHTML += `<option value="${u.key}">${d.nome.toUpperCase()}</option>`;
+                    
+                    lista.innerHTML += `<tr class="border-b-4 border-black hover:bg-gray-100"><td class="p-4 font-black text-red-600">${d.nome || 'Sem Nome'}</td><td class="p-4 font-black">${u.key}</td><td class="p-4 font-mono">${d.senha}</td><td class="p-4">B:${d.base}/C:${d.acordoCPA}</td><td class="p-4">${d.pagamento}</td><td class="p-4"><button onclick="excluir('${u.key}')" class="text-red-600"><i data-lucide="trash-2"></i></button></td></tr>`;
+                    select.innerHTML += `<option value="${u.key}">${(d.nome || u.key).toUpperCase()}</option>`;
 
                     if(d.historico) {
                         Object.keys(d.historico).forEach(data => {
@@ -212,7 +219,7 @@
         let acBase = 0, acCPA = 0;
         function carregarAcordoParaLancamento() {
             const id = document.getElementById('select-influencer').value;
-            if(id) {
+            if(id && influsData[id]) {
                 acBase = influsData[id].base || 0;
                 acCPA = influsData[id].acordoCPA || 0;
                 document.getElementById('label-base').innerText = acBase;
@@ -230,6 +237,8 @@
         function salvarLancamento() {
             const id = document.getElementById('select-influencer').value;
             const data = document.getElementById('data-global').value;
+            if(!id) return alert("Selecione um influenciador");
+
             db.ref('usuarios/'+id+'/historico/'+data).set({
                 registros: parseInt(document.getElementById('val-reg').value)||0,
                 qftd: parseInt(document.getElementById('val-qftd').value)||0,
@@ -237,20 +246,38 @@
                 depositos_qftd: parseFloat(document.getElementById('val-dep-qftd').value)||0,
                 depositos_brutos: parseFloat(document.getElementById('val-dep-bruto').value)||0,
                 cpa: parseFloat(document.getElementById('val-cpa').value)||0
-            }).then(() => { alert("LANÇADO!"); location.reload(); });
+            }).then(() => { 
+                alert("LANÇADO!"); 
+                document.getElementById('area-lancamento').classList.add('hidden');
+                document.getElementById('select-influencer').value = "";
+            });
         }
 
         function salvarNovoInflu() {
-            const email = document.getElementById('new-email').value.toLowerCase().trim().replace(/\./g, '_');
+            const emailRaw = document.getElementById('new-email').value;
+            if(!emailRaw) return alert("E-mail é obrigatório!");
+            
+            const email = emailRaw.toLowerCase().trim().replace(/\s/g, '').replace(/\./g, '_');
             const data = {
-                nome: document.getElementById('new-name').value.trim(),
+                nome: document.getElementById('new-name').value.trim() || email,
                 senha: document.getElementById('new-pass').value.trim(),
                 base: parseFloat(document.getElementById('new-base').value)||0,
                 acordoCPA: parseFloat(document.getElementById('new-cpa').value)||0,
                 pix: document.getElementById('new-pix').value.trim(),
-                pagamento: document.getElementById('pay-freq').value + " (" + document.getElementById('pay-day').value + ")"
+                pagamento: document.getElementById('pay-freq').value + " (" + document.getElementById('pay-day').value + ")",
+                dataInicio: "01/01/2026",
+                dataFim: "31/12/2026"
             };
-            db.ref('usuarios/'+email).set(data).then(() => { alert("CADASTRADO!"); location.reload(); });
+            
+            if(!data.senha) return alert("Defina uma senha!");
+
+            db.ref('usuarios/'+email).set(data).then(() => { 
+                alert("CADASTRADO COM SUCESSO!"); 
+                mudarTab('gerenciar');
+                // Limpar campos
+                document.getElementById('new-email').value = "";
+                document.getElementById('new-pass').value = "";
+            });
         }
 
         function ajustarDias() {
@@ -265,14 +292,23 @@
         }
 
         function mudarTab(tab) {
-            ['lancar', 'historico', 'gerenciar', 'criar', 'perfil'].forEach(b => document.getElementById('box-'+b).classList.add('hidden'));
+            ['lancar', 'historico', 'gerenciar', 'criar', 'perfil'].forEach(b => {
+                const element = document.getElementById('box-'+b);
+                if(element) element.classList.add('hidden');
+            });
             document.getElementById('box-'+tab).classList.remove('hidden');
-            ['lancar', 'historico', 'gerenciar', 'criar'].forEach(b => document.getElementById('btn-'+b).classList.remove('tab-active'));
-            if(tab !== 'perfil') document.getElementById('btn-'+tab).classList.add('tab-active');
+            
+            ['lancar', 'historico', 'gerenciar', 'criar'].forEach(b => {
+                const btn = document.getElementById('btn-'+b);
+                if(btn) btn.classList.remove('tab-active');
+            });
+            const activeBtn = document.getElementById('btn-'+tab);
+            if(activeBtn) activeBtn.classList.add('tab-active');
             lucide.createIcons();
         }
 
         function excluir(id) { if(confirm("APAGAR?")) db.ref('usuarios/'+id).remove(); }
+        
         ajustarDias();
         carregarDados();
         lucide.createIcons();
