@@ -7,32 +7,45 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         body { background-color: #0f172a; font-family: 'Inter', sans-serif; color: white; }
         .login-card { background-color: #1a2235; border: 1px solid #334155; }
-        input { background: #0f172a !important; border: 1px solid #334155 !important; transition: 0.3s; color: white !important; }
-        input:focus { border-color: #3b82f6 !important; outline: none; }
+        input { background: #0f172a !important; border: 1px solid #334155 !important; transition: 0.3s; color: white !important; font-weight: 600; }
+        input:focus { border-color: #3b82f6 !important; outline: none; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+        .tuf-logo { filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.3)); }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-6">
-    <div class="w-full max-w-md login-card p-10 rounded-3xl shadow-2xl">
+    <div class="w-full max-w-md login-card p-10 rounded-[2.5rem] shadow-2xl">
         <div class="text-center mb-10">
-            <h1 class="text-3xl font-black italic tracking-tighter text-white">TUF<span class="text-blue-500">AGENCY</span></h1>
-            <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mt-2">Painel de Afiliados</p>
+            <img src="icones/tuf.png" class="h-16 mx-auto mb-6 tuf-logo">
+            <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mt-2">Painel de Acesso Afiliados</p>
         </div>
+        
         <div class="space-y-6">
             <div>
-                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-2">Usuário</label>
-                <input type="text" id="user" class="w-full p-4 rounded-xl" placeholder="Login do influencer">
+                <label class="block text-[10px] font-black text-slate-500 uppercase mb-2 ml-1 tracking-widest">E-mail / Usuário</label>
+                <input type="text" id="user" class="w-full p-5 rounded-2xl" placeholder="exemplo@tuf.com">
             </div>
-            <div>
-                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-2">Senha</label>
-                <input type="password" id="pass" class="w-full p-4 rounded-xl" placeholder="••••••••">
+            <div class="relative">
+                <label class="block text-[10px] font-black text-slate-500 uppercase mb-2 ml-1 tracking-widest">Senha de Acesso</label>
+                <input type="password" id="pass" class="w-full p-5 rounded-2xl" placeholder="••••••••">
+                <button onclick="togglePass()" class="absolute right-5 top-11 text-slate-500 hover:text-white transition">
+                    <i data-lucide="eye" class="w-5 h-5"></i>
+                </button>
             </div>
-            <button onclick="realizarLogin()" class="w-full bg-blue-600 hover:bg-blue-500 p-4 rounded-xl font-bold uppercase text-sm transition">Acessar Painel</button>
+            <button onclick="realizarLogin()" class="w-full bg-blue-600 hover:bg-blue-500 p-5 rounded-2xl font-black italic uppercase text-sm transition transform active:scale-95 shadow-lg shadow-blue-600/20">
+                Acessar Painel TUF
+            </button>
+        </div>
+
+        <div class="mt-10 text-center">
+            <p class="text-[9px] text-slate-600 font-bold uppercase tracking-widest">© TUF Agency - Marketing SPRBT desde 2023</p>
         </div>
     </div>
+
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyC-0AR8LPQJpdVcYp6QY8nUQJgBGr8oOy0",
@@ -47,21 +60,38 @@
         const db = firebase.database();
 
         function realizarLogin() {
-            const u = document.getElementById('user').value.toLowerCase().trim();
+            const rawUser = document.getElementById('user').value.toLowerCase().trim();
             const p = document.getElementById('pass').value;
-            if(u === "admin" && p === "thaimorrowland2026") {
-                sessionStorage.setItem('adminAuth', 'true');
+            
+            if(!rawUser || !p) return alert("Preencha todos os campos.");
+
+            // Limpeza inteligente igual ao Admin v4
+            const u = rawUser.replace(/\./g, '_').replace(/@/g, '_at_');
+
+            // Atalho rápido para Admin
+            if(rawUser === "admin" && p === "thaimorrowland2026") {
+                sessionStorage.setItem('adminLogado', 'true');
                 window.location.href = 'admin.html';
                 return;
             }
+
             db.ref('usuarios/' + u).once('value', (s) => {
                 const d = s.val();
                 if(d && d.senha === p) {
                     localStorage.setItem('usuarioLogado', u);
                     window.location.href = 'dashboard.html';
-                } else { alert("Acesso negado."); }
+                } else { 
+                    alert("Usuário ou senha incorretos."); 
+                }
             });
         }
+
+        function togglePass() {
+            const input = document.getElementById('pass');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+        
+        lucide.createIcons();
     </script>
 </body>
 </html>
