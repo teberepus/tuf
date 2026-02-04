@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>TUF Agency - Admin Master</title>
+    <title>TUF Agency - Admin Master Red</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database-compat.js"></script>
@@ -10,97 +10,185 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         body { background-color: #0f172a; color: white; font-family: 'Inter', sans-serif; }
-        .sidebar { background-color: #1a2235; border-right: 1px solid #2d3748; }
-        input, select { background: #1e293b; border: 1px solid #334155; padding: 12px; border-radius: 8px; width: 100%; color: white; margin-bottom: 15px; outline: none; }
-        .badge { background: #a3e635; color: #0f172a; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; }
+        .sidebar { background-color: #111827; border-right: 1px solid #374151; }
+        .tab-btn { padding: 12px 24px; border-bottom: 2px solid transparent; transition: 0.3s; color: #94a3b8; font-weight: 700; font-size: 11px; text-transform: uppercase; }
+        .tab-btn.active { border-color: #ef4444; color: #ef4444; background-color: #1f2937; }
+        input, select { background: #1f2937; border: 1px solid #374151; padding: 12px; border-radius: 12px; width: 100%; color: white; margin-bottom: 12px; outline: none; transition: 0.3s; }
+        input:focus { border-color: #ef4444; box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2); }
+        .btn-red { background-color: #ef4444; transition: 0.3s; }
+        .btn-red:hover { background-color: #dc2626; transform: translateY(-1px); }
         #login-admin-screen { background-color: #0f172a; position: fixed; inset: 0; z-index: 999; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body class="flex min-h-screen">
+
     <div id="login-admin-screen">
-        <div class="w-full max-w-sm p-8 bg-[#1a2235] rounded-3xl border border-slate-700">
-            <h1 class="text-2xl font-black italic text-center mb-8">TUF<span class="text-blue-500">ADMIN</span></h1>
-            <input type="password" id="admin-pass-input" placeholder="Senha Mestre" class="text-center">
-            <button onclick="verificarSenha()" class="w-full bg-blue-600 p-4 rounded-xl font-bold uppercase text-xs">Entrar</button>
+        <div class="w-full max-w-sm p-8 bg-[#111827] rounded-3xl border border-slate-800 shadow-2xl text-center">
+            <img src="icones/tuf.png" class="h-10 mx-auto mb-8">
+            <h2 class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-6">Controle Interno TUF</h2>
+            <input type="password" id="admin-pass-input" placeholder="Senha Master" class="text-center">
+            <button onclick="verificarSenhaAdmin()" class="w-full btn-red p-4 rounded-xl font-bold uppercase text-xs">Acessar Sistema</button>
         </div>
     </div>
 
     <aside class="w-64 sidebar p-6 hidden md:flex flex-col">
-        <h1 class="text-xl font-black italic mb-10 text-blue-500">TUF AGENCY</h1>
+        <img src="icones/tuf.png" class="h-8 mb-10 w-fit">
         <nav class="space-y-2">
-            <button onclick="mudarTab('lancar')" class="flex items-center w-full text-blue-400 p-3 rounded-lg bg-slate-800/50 border-l-4 border-blue-500 font-bold text-sm">Lançamentos</button>
-            <button onclick="mudarTab('criar')" class="flex items-center w-full text-slate-400 p-3 rounded-lg hover:text-white font-bold text-sm">Criar Login</button>
+            <button onclick="mudarTab('lancar')" id="btn-tab-l" class="flex items-center w-full text-red-500 p-3 rounded-xl bg-red-500/10 border-l-4 border-red-500 font-bold text-sm">
+                <i data-lucide="bar-chart-3" class="mr-3 w-4 h-4"></i> Lançamentos
+            </button>
+            <button onclick="mudarTab('criar')" id="btn-tab-c" class="flex items-center w-full text-slate-400 p-3 rounded-xl hover:text-white font-bold text-sm">
+                <i data-lucide="user-plus" class="mr-3 w-4 h-4"></i> Novo Influencer
+            </button>
         </nav>
     </aside>
 
     <main class="flex-1 p-10">
         <div id="box-lancar">
             <div class="flex justify-between items-center mb-8">
-                <h2 class="text-2xl font-bold uppercase">Gerenciamento TUF</h2>
-                <input type="date" id="data-global" class="!mb-0 !p-2 !w-40 text-xs">
+                <div>
+                    <h2 class="text-2xl font-bold">Lançamento de Dados</h2>
+                    <p class="text-slate-500 text-sm">Os valores são atualizados simultaneamente no painel do influenciador.</p>
+                </div>
+                <input type="date" id="data-global" class="!mb-0 !p-2 !w-44 text-xs font-bold text-red-500">
             </div>
-            <div class="bg-slate-800/20 rounded-2xl border border-slate-700 overflow-hidden mb-10">
-                <table class="w-full text-left text-xs">
-                    <thead class="bg-slate-800 text-slate-400"><tr><th class="p-4">Influencer</th><th class="p-4">Senha</th><th class="p-4 text-right">Ação</th></tr></thead>
+
+            <div class="mb-8 overflow-hidden bg-slate-800/20 rounded-2xl border border-slate-700">
+                <table class="w-full text-left text-[11px]">
+                    <thead class="bg-slate-800/50 text-slate-400 uppercase">
+                        <tr><th class="p-4">Influencer / E-mail</th><th class="p-4">Acordo CPA</th><th class="p-4">PIX</th><th class="p-4 text-right">Ações</th></tr>
+                    </thead>
                     <tbody id="tabela-influencers"></tbody>
                 </table>
             </div>
-            <div id="form-edicao" class="hidden bg-slate-800/40 border border-blue-500/30 p-8 rounded-2xl">
-                <h3 class="text-lg font-bold mb-6">Lançar para: <span id="user-selecionado" class="text-blue-400 uppercase"></span></h3>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div><label class="text-[10px] text-slate-500 font-bold">REGISTROS</label><input type="number" id="edit-reg" value="0"></div>
-                    <div><label class="text-[10px] text-slate-500 font-bold">FTDs</label><input type="number" id="edit-ftd" value="0"></div>
-                    <div><label class="text-[10px] text-slate-500 font-bold">DEPÓSITOS</label><input type="number" id="edit-dep" value="0"></div>
-                    <div><label class="text-[10px] text-slate-500 font-bold">CPA</label><input type="number" id="edit-cpa" value="0"></div>
+
+            <div id="form-edicao" class="hidden bg-slate-800/40 border border-red-500/20 p-8 rounded-3xl animate-pulse-once">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-bold">Lançar para: <span id="user-selecionado" class="text-red-500 uppercase"></span></h3>
+                    <span class="text-[10px] bg-red-500/20 text-red-400 px-3 py-1 rounded-full font-bold">ACORDO: R$ <span id="acordo-label">0</span></span>
                 </div>
-                <button onclick="salvarHistorico()" class="w-full bg-green-600 p-4 rounded-xl font-bold uppercase mt-4">Salvar Dados</button>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div><label class="text-[10px] text-slate-500 font-bold uppercase">Registros</label><input type="number" id="edit-reg" value="0"></div>
+                    <div><label class="text-[10px] text-slate-500 font-bold uppercase">QFTD (Gera CPA)</label><input type="number" id="edit-ftd" value="0" oninput="calcularCPAAutomatico()"></div>
+                    <div><label class="text-[10px] text-slate-500 font-bold uppercase">Depósitos (R$)</label><input type="number" id="edit-dep" value="0"></div>
+                    <div><label class="text-[10px] text-slate-500 font-bold uppercase">Total CPA (Calculado)</label><input type="number" id="edit-cpa" value="0" class="text-red-400 font-bold"></div>
+                </div>
+                <button onclick="salvarNoHistorico()" class="w-full btn-red p-4 rounded-xl font-bold uppercase mt-6 shadow-lg shadow-red-500/20">Confirmar Lançamento Simultâneo</button>
             </div>
         </div>
-        <div id="box-criar" class="hidden max-w-xl">
-            <h2 class="text-2xl font-bold mb-6">Novo Influencer</h2>
-            <input type="text" id="new-user" placeholder="Login">
-            <input type="password" id="new-pass" placeholder="Senha">
-            <button onclick="criarUsuario()" class="w-full bg-blue-600 p-4 rounded-xl font-bold uppercase mt-4">Criar</button>
+
+        <div id="box-criar" class="hidden max-w-2xl">
+            <h2 class="text-2xl font-bold mb-8 text-red-500">Cadastrar Influenciador</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div><label class="text-[10px] text-slate-500 font-bold uppercase">E-mail de Acesso (Login)</label><input type="email" id="new-email" placeholder="exemplo@tuf.com"></div>
+                <div><label class="text-[10px] text-slate-500 font-bold uppercase">Senha</label><input type="password" id="new-pass" placeholder="Senha do influ"></div>
+                <div><label class="text-[10px] text-slate-500 font-bold uppercase">Nome do Influencer</label><input type="text" id="new-name" placeholder="Ex: Preta Morais"></div>
+                <div><label class="text-[10px] text-slate-500 font-bold uppercase">Valor do Acordo CPA (R$)</label><input type="number" id="new-acordo" placeholder="70.00"></div>
+                <div class="col-span-2"><label class="text-[10px] text-slate-500 font-bold uppercase">Chave PIX para Pagamento</label><input type="text" id="new-pix" placeholder="E-mail, CPF ou Telefone"></div>
+            </div>
+            <button onclick="criarUsuario()" class="w-full btn-red p-4 rounded-xl font-bold uppercase mt-4">Salvar Cadastro e Gerar Acesso</button>
         </div>
     </main>
 
     <script>
-        const firebaseConfig = { apiKey: "AIzaSyC-0AR8LPQJpdVcYp6QY8nUQJgBGr8oOy0", authDomain: "tufagency-6902e.firebaseapp.com", databaseURL: "https://tufagency-6902e-default-rtdb.firebaseio.com", projectId: "tufagency-6902e", storageBucket: "tufagency-6902e.firebasestorage.app", messagingSenderId: "34548749822", appId: "1:34548749822:web:74676530713d232a725caf" };
+        const firebaseConfig = {
+            apiKey: "AIzaSyC-0AR8LPQJpdVcYp6QY8nUQJgBGr8oOy0",
+            authDomain: "tufagency-6902e.firebaseapp.com",
+            databaseURL: "https://tufagency-6902e-default-rtdb.firebaseio.com",
+            projectId: "tufagency-6902e",
+            storageBucket: "tufagency-6902e.firebasestorage.app",
+            messagingSenderId: "34548749822",
+            appId: "1:34548749822:web:74676530713d232a725caf"
+        };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
         if(sessionStorage.getItem('adminLogado') === 'true') document.getElementById('login-admin-screen').style.display = 'none';
-        function verificarSenha() { if(document.getElementById('admin-pass-input').value === "thaimorrowland2026") { sessionStorage.setItem('adminLogado', 'true'); location.reload(); } }
+        function verificarSenhaAdmin() { if(document.getElementById('admin-pass-input').value === "thaimorrowland2026") { sessionStorage.setItem('adminLogado', 'true'); location.reload(); } }
 
         document.getElementById('data-global').valueAsDate = new Date();
-        function carregar() {
-            db.ref('usuarios').once('value', s => {
+        let acordoAtual = 0;
+        let idSelecionado = "";
+
+        function carregarInfluencers() {
+            db.ref('usuarios').on('value', s => {
                 const t = document.getElementById('tabela-influencers'); t.innerHTML = '';
                 s.forEach(u => {
-                    t.innerHTML += `<tr onclick="abrirEdicao('${u.key}')" class="border-t border-slate-700 hover:bg-slate-700/30 cursor-pointer">
-                        <td class="p-4 font-bold text-blue-400 uppercase">${u.key}</td><td class="p-4 text-slate-400">${u.val().senha}</td>
-                        <td class="p-4 text-right"><button onclick="event.stopPropagation(); excluir('${u.key}')" class="text-red-500">Excluir</button></td></tr>`;
+                    const d = u.val();
+                    t.innerHTML += `
+                        <tr onclick="abrirEdicao('${u.key}', ${d.acordoCPA || 0})" class="border-t border-slate-700/50 hover:bg-red-500/5 cursor-pointer">
+                            <td class="p-4 font-bold text-white uppercase">${d.nome || u.key}<br><span class="text-[9px] text-slate-500">${u.key}</span></td>
+                            <td class="p-4 text-red-400 font-bold">R$ ${d.acordoCPA || 0}</td>
+                            <td class="p-4 text-slate-400">${d.pix || '---'}</td>
+                            <td class="p-4 text-right"><button onclick="event.stopPropagation(); excluir('${u.key}')" class="text-slate-600 hover:text-red-500 transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td>
+                        </tr>`;
                 });
+                lucide.createIcons();
             });
         }
-        let sel = "";
-        function abrirEdicao(u) { sel = u; document.getElementById('user-selecionado').innerText = u; document.getElementById('form-edicao').classList.remove('hidden'); }
-        function salvarHistorico() {
-            const d = document.getElementById('data-global').value;
-            db.ref('usuarios/'+sel+'/historico/'+d).set({
-                registros: parseInt(document.getElementById('edit-reg').value)||0,
-                ftd: parseInt(document.getElementById('edit-ftd').value)||0,
-                depositos: parseFloat(document.getElementById('edit-dep').value)||0,
-                cpa: parseFloat(document.getElementById('edit-cpa').value)||0
-            }).then(() => { alert("Salvo!"); document.getElementById('form-edicao').classList.add('hidden'); });
+
+        function abrirEdicao(id, acordo) {
+            idSelecionado = id;
+            acordoAtual = acordo;
+            document.getElementById('user-selecionado').innerText = id;
+            document.getElementById('acordo-label').innerText = acordo;
+            document.getElementById('form-edicao').classList.remove('hidden');
+            document.getElementById('edit-ftd').value = 0;
+            document.getElementById('edit-cpa').value = 0;
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
+
+        function calcularCPAAutomatico() {
+            const qftd = parseInt(document.getElementById('edit-ftd').value) || 0;
+            document.getElementById('edit-cpa').value = qftd * acordoAtual;
+        }
+
+        function salvarNoHistorico() {
+            const data = document.getElementById('data-global').value;
+            db.ref('usuarios/' + idSelecionado + '/historico/' + data).set({
+                registros: parseInt(document.getElementById('edit-reg').value) || 0,
+                ftd: parseInt(document.getElementById('edit-ftd').value) || 0,
+                depositos: parseFloat(document.getElementById('edit-dep').value) || 0,
+                cpa: parseFloat(document.getElementById('edit-cpa').value) || 0
+            }).then(() => {
+                alert("Lançamento concluído com sucesso!");
+                document.getElementById('form-edicao').classList.add('hidden');
+            });
+        }
+
         function criarUsuario() {
-            const u = document.getElementById('new-user').value.toLowerCase().trim();
-            const p = document.getElementById('new-pass').value;
-            db.ref('usuarios/'+u).set({ senha: p, dataInicio: "01/01/2026", dataFim: "31/12/2026" }).then(() => location.reload());
+            // Limpeza inteligente de e-mail e strings
+            const email = document.getElementById('new-email').value.toLowerCase().trim().replace(/\s/g, '').replace(/\./g, '_');
+            const pass = document.getElementById('new-pass').value.trim();
+            const nome = document.getElementById('new-name').value.trim();
+            const acordo = parseFloat(document.getElementById('new-acordo').value) || 0;
+            const pix = document.getElementById('new-pix').value.trim();
+
+            if(!email || !pass) return alert("E-mail e Senha são obrigatórios!");
+
+            db.ref('usuarios/' + email).set({
+                senha: pass,
+                nome: nome,
+                acordoCPA: acordo,
+                pix: pix,
+                dataInicio: "01/01/2026",
+                dataFim: "31/12/2026"
+            }).then(() => {
+                alert("Influenciador " + nome + " cadastrado!");
+                location.reload();
+            });
         }
-        function mudarTab(tab) { document.getElementById('box-lancar').classList.toggle('hidden', tab !== 'lancar'); document.getElementById('box-criar').classList.toggle('hidden', tab !== 'criar'); }
-        carregar();
+
+        function mudarTab(tab) {
+            document.getElementById('box-lancar').classList.toggle('hidden', tab !== 'lancar');
+            document.getElementById('box-criar').classList.toggle('hidden', tab !== 'criar');
+            document.getElementById('btn-tab-l').className = tab === 'lancar' ? 'flex items-center w-full text-red-500 p-3 rounded-xl bg-red-500/10 border-l-4 border-red-500 font-bold text-sm' : 'flex items-center w-full text-slate-400 p-3 rounded-xl hover:text-white font-bold text-sm';
+            document.getElementById('btn-tab-c').className = tab === 'criar' ? 'flex items-center w-full text-red-500 p-3 rounded-xl bg-red-500/10 border-l-4 border-red-500 font-bold text-sm' : 'flex items-center w-full text-slate-400 p-3 rounded-xl hover:text-white font-bold text-sm';
+        }
+
+        function excluir(id) { if(confirm("Remover influenciador?")) db.ref('usuarios/' + id).remove(); }
+        carregarInfluencers();
+        lucide.createIcons();
     </script>
 </body>
 </html>
