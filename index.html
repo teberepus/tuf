@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TUF Agency - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database-compat.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #0f172a; font-family: 'Inter', sans-serif; color: white; }
+        .login-card { background-color: #1a2235; border: 1px solid #334155; }
+        input { background: #0f172a !important; border: 1px solid #334155 !important; transition: 0.3s; color: white !important; }
+        input:focus { border-color: #3b82f6 !important; outline: none; }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-6">
+    <div class="w-full max-w-md login-card p-10 rounded-3xl shadow-2xl">
+        <div class="text-center mb-10">
+            <h1 class="text-3xl font-black italic tracking-tighter text-white">TUF<span class="text-blue-500">AGENCY</span></h1>
+            <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mt-2">Painel de Afiliados</p>
+        </div>
+        <div class="space-y-6">
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-2">Usuário</label>
+                <input type="text" id="user" class="w-full p-4 rounded-xl" placeholder="Login do influencer">
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-2">Senha</label>
+                <input type="password" id="pass" class="w-full p-4 rounded-xl" placeholder="••••••••">
+            </div>
+            <button onclick="realizarLogin()" class="w-full bg-blue-600 hover:bg-blue-500 p-4 rounded-xl font-bold uppercase text-sm transition">Acessar Painel</button>
+        </div>
+    </div>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC-0AR8LPQJpdVcYp6QY8nUQJgBGr8oOy0",
+            authDomain: "tufagency-6902e.firebaseapp.com",
+            databaseURL: "https://tufagency-6902e-default-rtdb.firebaseio.com",
+            projectId: "tufagency-6902e",
+            storageBucket: "tufagency-6902e.firebasestorage.app",
+            messagingSenderId: "34548749822",
+            appId: "1:34548749822:web:74676530713d232a725caf"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        function realizarLogin() {
+            const u = document.getElementById('user').value.toLowerCase().trim();
+            const p = document.getElementById('pass').value;
+            if(u === "admin" && p === "thaimorrowland2026") {
+                sessionStorage.setItem('adminAuth', 'true');
+                window.location.href = 'admin.html';
+                return;
+            }
+            db.ref('usuarios/' + u).once('value', (s) => {
+                const d = s.val();
+                if(d && d.senha === p) {
+                    localStorage.setItem('usuarioLogado', u);
+                    window.location.href = 'dashboard.html';
+                } else { alert("Acesso negado."); }
+            });
+        }
+    </script>
+</body>
+</html>
